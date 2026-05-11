@@ -1,36 +1,30 @@
-import fs from 'fs/promises'
-import path from 'path'
+import { supabase } from './supabase'
 
-export async function cleanupOldFiles(dirPath: string, limit = 50): Promise<void> {
-  try {
-    const entries = await fs.readdir(dirPath)
-    const stats = await Promise.all(
-      entries.map(async (name) => {
-        try {
-          const fullPath = path.join(dirPath, name)
-          const stat = await fs.stat(fullPath)
-          return { name, fullPath, mtime: stat.mtime.getTime() }
-        } catch {
-          return null
-        }
-      })
-    )
+export async function uploadToStorage(
+  bucket: string,
+  filePath: string,
+  buffer: Buffer,
+  contentType: string,
+): Promise<string> {
+  const { error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, buffer, { contentType, upsert: true })
+  if (error) throw error
 
-    const files = stats
-      .filter((s): s is NonNullable<typeof s> => s !== null && !s.name.startsWith('.'))
-      .sort((a, b) => b.mtime - a.mtime)
+  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath)
+  return data.publicUrl
+}
 
-    const toDelete = files.slice(limit)
-    await Promise.all(
-      toDelete.map(async ({ fullPath }) => {
-        try {
-          await fs.unlink(fullPath)
-        } catch (err) {
-          console.error(`GC: failed to delete ${fullPath}`, err)
-        }
-      })
-    )
-  } catch (err) {
-    console.error(`GC: failed to scan ${dirPath}`, err)
+export async function cleanupOldStorageFiles(
+  bucket: string,
+  limit = 50,
+): Promise<void> {
+  const { data } = await supabase.storage
+    .from(bucket)
+    .list('', { limit: 200, sortBy: { column: 'created_at', order: 'asc' } })
+  if (!data || data.length <= limit) return
+  const toDelete = data.slice(0, data.length - limit).map(f => f.name)
+  if (toDelete.length > 0) {
+    await supabase.storage.from(bucket).remove(toDelete)
   }
 }

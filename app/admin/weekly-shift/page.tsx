@@ -84,13 +84,15 @@ export default function WeeklyShiftPage() {
 
       <form action={handleSubmit} className="flex flex-col gap-5">
         <div className="rounded-xl border p-5" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-          <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--muted)' }}>주차 레이블</p>
+          <p className="text-xs font-medium mb-1" style={{ color: 'var(--muted)' }}>기준일</p>
+          <p className="text-xs mb-2" style={{ color: '#52525b' }}>예: 2026-05-08, 5월 둘째 주, 2026 W19 등 자유 형식</p>
           <input
             name="label"
-            type="date"
+            type="text"
             defaultValue={today}
-            className="rounded-lg border px-3 py-2 text-sm text-white outline-none focus:border-purple-500 transition-colors"
-            style={{ background: '#0e0e11', borderColor: 'var(--border)' }}
+            placeholder="기준일을 입력하세요"
+            className="rounded-lg border px-3 py-2 text-sm text-white outline-none focus:border-purple-500 transition-colors w-full sm:w-auto"
+            style={{ background: '#0e0e11', borderColor: 'var(--border)', minWidth: '240px' }}
           />
         </div>
 

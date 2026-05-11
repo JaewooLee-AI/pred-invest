@@ -1,12 +1,16 @@
 import Link from 'next/link'
-import { getDB } from '@/lib/db'
+import { getLatestCsvUpload, getAllWeeklyShifts, getAllNotices } from '@/lib/db'
 
 export default async function AdminPage() {
-  const db = await getDB()
+  const [csvUpload, weeklyShifts, notices] = await Promise.all([
+    getLatestCsvUpload(),
+    getAllWeeklyShifts(),
+    getAllNotices(),
+  ])
   const stats = [
-    { label: 'CSV 업로드', count: db.csvUploads.length, href: '/admin/upload-csv', color: 'var(--accent-blue)' },
-    { label: '주간 궤적', count: db.weeklyShifts.length, href: '/admin/weekly-shift', color: 'var(--accent-purple)' },
-    { label: '공지사항', count: db.notices.length, href: '/admin/notice', color: 'var(--accent-emerald)' },
+    { label: 'CSV 업로드', count: csvUpload ? 1 : 0, href: '/admin/upload-csv', color: 'var(--accent-blue)' },
+    { label: '주간 궤적', count: weeklyShifts.length, href: '/admin/weekly-shift', color: 'var(--accent-purple)' },
+    { label: '공지사항', count: notices.length, href: '/admin/notice', color: 'var(--accent-emerald)' },
   ]
 
   return (

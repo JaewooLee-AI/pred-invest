@@ -1,10 +1,8 @@
 'use server'
 
-import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { addCsvUpload } from '@/lib/db'
 import { parseCsvText, ASSET_NAMES } from '@/lib/csv-parser'
-import { cleanupOldFiles } from '@/lib/storage'
 import { revalidatePath } from 'next/cache'
 
 export async function uploadCsvAction(formData: FormData) {
@@ -28,16 +26,7 @@ export async function uploadCsvAction(formData: FormData) {
   }
 
   const id = uuidv4()
-  await addCsvUpload({
-    id,
-    uploadedAt: new Date().toISOString(),
-    referenceDate,
-    chartData,
-    assetComments,
-  })
-
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'csv')
-  await cleanupOldFiles(uploadDir)
+  await addCsvUpload({ id, uploadedAt: new Date().toISOString(), referenceDate, chartData, assetComments })
 
   revalidatePath('/')
   return { success: true }

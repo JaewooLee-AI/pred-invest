@@ -1,7 +1,4 @@
-import fs from 'fs/promises'
-import path from 'path'
-
-const DB_PATH = path.join(process.cwd(), 'data', 'db.json')
+import { supabase } from './supabase'
 
 export interface AssetComment {
   [asset: string]: string
@@ -36,66 +33,126 @@ export interface Notice {
   description: string
 }
 
-export interface DB {
-  csvUploads: CsvUpload[]
-  weeklyShifts: WeeklyShift[]
-  notices: Notice[]
-}
+export async function addCsvUpload(upload: CsvUpload): Promise<void> {
+  const { error } = await supabase.from('pred_invest_csv_uploads').upsert({
+    id: upload.id,
+    uploaded_at: upload.uploadedAt,
+    reference_date: upload.referenceDate,
+    chart_data: upload.chartData,
+    asset_comments: upload.assetComments,
+  })
+  if (error) throw error
 
-async function readDB(): Promise<DB> {
-  try {
-    const raw = await fs.readFile(DB_PATH, 'utf-8')
-    return JSON.parse(raw)
-  } catch {
-    return { csvUploads: [], weeklyShifts: [], notices: [] }
+  // Keep only 50 most recent
+  const { data: old } = await supabase
+    .from('pred_invest_csv_uploads')
+    .select('id')
+    .order('uploaded_at', { ascending: false })
+    .range(50, 9999)
+  if (old?.length) {
+    await supabase.from('pred_invest_csv_uploads').delete().in('id', old.map(r => r.id))
   }
 }
 
-async function writeDB(db: DB): Promise<void> {
-  await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2), 'utf-8')
-}
-
-export async function getDB(): Promise<DB> {
-  return readDB()
-}
-
-export async function addCsvUpload(upload: CsvUpload): Promise<void> {
-  const db = await readDB()
-  db.csvUploads.unshift(upload)
-  if (db.csvUploads.length > 50) db.csvUploads = db.csvUploads.slice(0, 50)
-  await writeDB(db)
-}
-
 export async function addWeeklyShift(shift: WeeklyShift): Promise<void> {
-  const db = await readDB()
-  db.weeklyShifts.unshift(shift)
-  if (db.weeklyShifts.length > 50) db.weeklyShifts = db.weeklyShifts.slice(0, 50)
-  await writeDB(db)
+  const { error } = await supabase.from('pred_invest_weekly_shifts').upsert({
+    id: shift.id,
+    uploaded_at: shift.uploadedAt,
+    label: shift.label,
+    assets: shift.assets,
+  })
+  if (error) throw error
+
+  const { data: old } = await supabase
+    .from('pred_invest_weekly_shifts')
+    .select('id')
+    .order('uploaded_at', { ascending: false })
+    .range(50, 9999)
+  if (old?.length) {
+    await supabase.from('pred_invest_weekly_shifts').delete().in('id', old.map(r => r.id))
+  }
 }
 
 export async function addNotice(notice: Notice): Promise<void> {
-  const db = await readDB()
-  db.notices.unshift(notice)
-  if (db.notices.length > 50) db.notices = db.notices.slice(0, 50)
-  await writeDB(db)
+  const { error } = await supabase.from('pred_invest_notices').upsert({
+    id: notice.id,
+    uploaded_at: notice.uploadedAt,
+    filename: notice.filename,
+    file_path: notice.filePath,
+    description: notice.description,
+  })
+  if (error) throw error
+
+  const { data: old } = await supabase
+    .from('pred_invest_notices')
+    .select('id')
+    .order('uploaded_at', { ascending: false })
+    .range(50, 9999)
+  if (old?.length) {
+    await supabase.from('pred_invest_notices').delete().in('id', old.map(r => r.id))
+  }
 }
 
 export async function getLatestCsvUpload(): Promise<CsvUpload | null> {
-  const db = await readDB()
-  return db.csvUploads[0] ?? null
+  const { data } = await supabase
+    .from('pred_invest_csv_uploads')
+    .select('*')
+    .order('uploaded_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (!data) return null
+  return {
+    id: data.id,
+    uploadedAt: data.uploaded_at,
+    referenceDate: data.reference_date,
+    chartData: data.chart_data,
+    assetComments: data.asset_comments,
+  }
 }
 
 export async function getLatestWeeklyShift(): Promise<WeeklyShift | null> {
-  const db = await readDB()
-  return db.weeklyShifts[0] ?? null
+  const { data } = await supabase
+    .from('pred_invest_weekly_shifts')
+    .select('*')
+    .order('uploaded_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (!data) return null
+  return {
+    id: data.id,
+    uploadedAt: data.uploaded_at,
+    label: data.label,
+    assets: data.assets,
+  }
 }
 
 export async function getAllWeeklyShifts(): Promise<WeeklyShift[]> {
-  const db = await readDB()
-  return db.weeklyShifts
+  const { data } = await supabase
+    .from('pred_invest_weekly_shifts')
+    .select('*')
+    .order('uploaded_at', { ascending: false })
+    .limit(50)
+  if (!data) return []
+  return data.map(r => ({
+    id: r.id,
+    uploadedAt: r.uploaded_at,
+    label: r.label,
+    assets: r.assets,
+  }))
 }
 
 export async function getAllNotices(): Promise<Notice[]> {
-  const db = await readDB()
-  return db.notices
+  const { data } = await supabase
+    .from('pred_invest_notices')
+    .select('*')
+    .order('uploaded_at', { ascending: false })
+    .limit(50)
+  if (!data) return []
+  return data.map(r => ({
+    id: r.id,
+    uploadedAt: r.uploaded_at,
+    filename: r.filename,
+    filePath: r.file_path,
+    description: r.description,
+  }))
 }
