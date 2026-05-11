@@ -10,37 +10,50 @@ const adminNav = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-screen flex" style={{ background: '#000' }}>
       <aside
-        className="w-52 shrink-0 flex flex-col border-r"
-        style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+        className="w-52 shrink-0 flex flex-col"
+        style={{
+          background: 'rgba(255,255,255,0.03)',
+          borderRight: '1px solid rgba(255,255,255,0.07)',
+        }}
       >
-        <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <Link href="/" className="flex items-center gap-2">
-            <span style={{ color: 'var(--accent-amber)' }}>◈</span>
-            <span className="text-sm font-bold text-white">CrossAsset</span>
+            <span
+              className="text-sm font-semibold tracking-tight"
+              style={{
+                background: 'linear-gradient(135deg, #f5f5f7 0%, rgba(245,245,247,0.6) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              CrossAsset
+            </span>
           </Link>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>Admin</p>
+          <p className="text-xs mt-0.5" style={{ color: '#3a3a3c' }}>Admin</p>
         </div>
 
-        <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
+        <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5">
           {adminNav.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className="px-3 py-2 text-xs rounded-lg transition-colors hover:bg-zinc-800 hover:text-white"
-              style={{ color: 'var(--muted)' }}
+              className="px-3 py-2 text-xs rounded-xl transition-all hover:opacity-80"
+              style={{ color: '#86868b', background: 'transparent' }}
             >
               {label}
             </Link>
           ))}
         </nav>
 
-        <div className="px-3 py-4 border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
           <form action={logoutAction}>
             <button
               type="submit"
-              className="w-full px-3 py-2 text-xs rounded-lg text-red-400 hover:bg-zinc-800 transition-colors text-left"
+              className="w-full px-3 py-2 text-xs rounded-xl transition-all hover:opacity-80 text-left"
+              style={{ color: '#ff453a' }}
             >
               로그아웃
             </button>

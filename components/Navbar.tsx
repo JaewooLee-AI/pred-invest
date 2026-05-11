@@ -18,26 +18,40 @@ export function Navbar() {
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b"
-      style={{ background: 'rgba(9,9,11,0.92)', borderColor: 'var(--border)', backdropFilter: 'blur(12px)' }}
+      className="sticky top-0 z-50"
+      style={{
+        background: 'rgba(0,0,0,0.75)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+      }}
     >
-      <div className="flex items-center justify-between px-4 sm:px-6 py-3">
+      <div className="max-w-[1200px] mx-auto flex items-center justify-between px-5 sm:px-8 h-11">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="text-sm font-bold tracking-tight" style={{ color: 'var(--accent-amber)' }}>◈</span>
-          <span className="text-sm font-semibold text-white">CrossAsset</span>
+          <span
+            className="text-sm font-semibold tracking-tight"
+            style={{
+              background: 'linear-gradient(135deg, #f5f5f7 0%, rgba(245,245,247,0.65) 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            CrossAsset
+          </span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden sm:flex items-center gap-5">
+        <div className="hidden sm:flex items-center gap-7">
           {navLinks.map(({ href, label }) => {
             const active = pathname === href
             return (
               <Link
                 key={href}
                 href={href}
-                className="text-xs font-medium transition-colors hover:text-white"
-                style={{ color: active ? 'white' : 'var(--muted)' }}
+                className="text-xs transition-all duration-150"
+                style={{ color: active ? '#f5f5f7' : '#86868b', fontWeight: active ? 500 : 400 }}
               >
                 {label}
               </Link>
@@ -45,8 +59,12 @@ export function Navbar() {
           })}
           <Link
             href="/admin"
-            className="text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors hover:bg-zinc-800"
-            style={{ color: 'var(--muted)', borderColor: 'var(--border)' }}
+            className="text-xs px-3.5 py-1.5 rounded-full transition-all duration-150 hover:opacity-80"
+            style={{
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: '#86868b',
+            }}
           >
             관리자
           </Link>
@@ -54,30 +72,21 @@ export function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="sm:hidden flex flex-col items-center justify-center w-8 h-8 gap-1.5 rounded-lg transition-colors hover:bg-zinc-800"
+          className="sm:hidden flex flex-col items-center justify-center w-8 h-8 gap-[5px]"
           onClick={() => setOpen(v => !v)}
           aria-label={open ? '메뉴 닫기' : '메뉴 열기'}
         >
           <span
-            className="w-5 h-0.5 rounded-full transition-all duration-200"
-            style={{
-              background: 'var(--muted)',
-              transform: open ? 'translateY(0.375rem) rotate(45deg)' : 'none',
-            }}
+            className="w-[18px] h-[1.5px] rounded-full transition-all duration-200"
+            style={{ background: '#86868b', transform: open ? 'translateY(6.5px) rotate(45deg)' : 'none' }}
           />
           <span
-            className="w-5 h-0.5 rounded-full transition-all duration-200"
-            style={{
-              background: 'var(--muted)',
-              opacity: open ? 0 : 1,
-            }}
+            className="w-[18px] h-[1.5px] rounded-full transition-all duration-200"
+            style={{ background: '#86868b', opacity: open ? 0 : 1 }}
           />
           <span
-            className="w-5 h-0.5 rounded-full transition-all duration-200"
-            style={{
-              background: 'var(--muted)',
-              transform: open ? 'translateY(-0.375rem) rotate(-45deg)' : 'none',
-            }}
+            className="w-[18px] h-[1.5px] rounded-full transition-all duration-200"
+            style={{ background: '#86868b', transform: open ? 'translateY(-6.5px) rotate(-45deg)' : 'none' }}
           />
         </button>
       </div>
@@ -85,8 +94,8 @@ export function Navbar() {
       {/* Mobile dropdown */}
       {open && (
         <div
-          className="sm:hidden border-t px-4 py-3 flex flex-col gap-1"
-          style={{ borderColor: 'var(--border)', background: 'rgba(9,9,11,0.98)' }}
+          className="sm:hidden px-4 pb-3 flex flex-col gap-0.5"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
           {navLinks.map(({ href, label }) => {
             const active = pathname === href
@@ -95,19 +104,22 @@ export function Navbar() {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-zinc-800"
-                style={{ color: active ? 'white' : 'var(--muted)', background: active ? 'rgba(255,255,255,0.05)' : undefined }}
+                className="flex items-center px-3 py-3 rounded-xl text-sm transition-all"
+                style={{
+                  color: active ? '#f5f5f7' : '#86868b',
+                  background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
+                }}
               >
                 {label}
               </Link>
             )
           })}
-          <div className="border-t my-1" style={{ borderColor: 'var(--border)' }} />
+          <div className="my-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
           <Link
             href="/admin"
             onClick={() => setOpen(false)}
-            className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-zinc-800"
-            style={{ color: 'var(--muted)' }}
+            className="flex items-center px-3 py-3 rounded-xl text-sm"
+            style={{ color: '#86868b' }}
           >
             관리자
           </Link>
