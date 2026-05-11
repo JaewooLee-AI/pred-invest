@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { getLatestCsvUpload, getAllWeeklyShifts, getAllNotices } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminPage() {
   const [csvUpload, weeklyShifts, notices] = await Promise.all([
     getLatestCsvUpload(),
