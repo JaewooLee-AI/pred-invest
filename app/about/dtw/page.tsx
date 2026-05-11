@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function DtwAboutPage() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs mb-8" style={{ color: 'var(--muted)' }}>
         <Link href="/" className="hover:text-white transition-colors">대시보드</Link>

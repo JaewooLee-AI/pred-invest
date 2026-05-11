@@ -26,7 +26,7 @@ export function WeeklyShiftGallery({ assets, label }: WeeklyShiftGalleryProps) {
       <p className="text-xs mb-4 font-mono" style={{ color: 'var(--muted)' }}>
         기준 주차: {label}
       </p>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {assets.filter(a => a.imagePath).map(asset => (
           <button
             key={asset.name}
@@ -50,12 +50,12 @@ export function WeeklyShiftGallery({ assets, label }: WeeklyShiftGalleryProps) {
 
       {selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
           style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
           onClick={() => setSelected(null)}
         >
           <div
-            className="relative max-w-3xl w-full rounded-2xl overflow-hidden border"
+            className="relative max-w-3xl w-full rounded-t-2xl sm:rounded-2xl overflow-hidden border"
             style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
             onClick={e => e.stopPropagation()}
           >

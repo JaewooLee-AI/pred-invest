@@ -1,4 +1,5 @@
 import { Navbar } from '@/components/Navbar'
+import { ChartCarousel } from '@/components/charts/ChartCarousel'
 import { AssetChart } from '@/components/charts/AssetChart'
 import { getLatestCsvUpload, getAllNotices, getLatestWeeklyShift } from '@/lib/db'
 import { ASSET_NAMES } from '@/lib/csv-parser'
@@ -17,9 +18,9 @@ export default async function DashboardPage() {
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <Navbar />
 
-      <main className="max-w-[1600px] mx-auto px-6 py-8">
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Hero / Status Row */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
           <StatCard
             label="기준일"
             value={csvData?.referenceDate ?? '—'}
@@ -46,16 +47,7 @@ export default async function DashboardPage() {
           <section className="col-span-12">
             <SectionHeader title="다중 자산군 상승 확률" sub="A·B·C 모델 3종 — 50주 예측 시계열" infoHref="/about/classification" infoLabel="분류 모델 안내 →" />
             {csvData ? (
-              <div className="grid grid-cols-3 gap-4">
-                {ASSET_NAMES.map(asset => (
-                  <AssetCard
-                    key={asset}
-                    asset={asset}
-                    data={csvData.chartData[asset] ?? []}
-                    comment={csvData.assetComments[asset] ?? ''}
-                  />
-                ))}
-              </div>
+              <ChartCarousel chartData={csvData.chartData} assetComments={csvData.assetComments} />
             ) : (
               <EmptyState
                 msg="업로드된 CSV 데이터가 없습니다."
@@ -66,10 +58,10 @@ export default async function DashboardPage() {
           </section>
 
           {/* Weekly Shift Preview */}
-          <section className="col-span-8">
+          <section className="col-span-12 lg:col-span-8">
             <SectionHeader title="주간 DTW 궤적" sub="현재 시장과 가장 유사한 과거 궤적 투사" infoHref="/about/dtw" infoLabel="DTW 안내 →" />
             {weeklyShift ? (
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {weeklyShift.assets.filter(a => a.imagePath).slice(0, 3).map(asset => (
                   <ShiftThumb key={asset.name} asset={asset} />
                 ))}
@@ -94,7 +86,7 @@ export default async function DashboardPage() {
           </section>
 
           {/* Notices */}
-          <section className="col-span-4">
+          <section className="col-span-12 lg:col-span-4">
             <SectionHeader title="공지사항" sub="최신 분석 리포트" />
             {notices.length > 0 ? (
               <div className="flex flex-col gap-3">
@@ -154,9 +146,9 @@ function StatCard({ label, value, color, sub }: { label: string; value: string; 
 
 function SectionHeader({ title, sub, infoHref, infoLabel }: { title: string; sub: string; infoHref?: string; infoLabel?: string }) {
   return (
-    <div className="flex items-center gap-3 mb-4">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-4">
       <h2 className="text-sm font-semibold text-white">{title}</h2>
-      <span className="text-xs" style={{ color: 'var(--muted)' }}>{sub}</span>
+      <span className="text-xs hidden sm:inline" style={{ color: 'var(--muted)' }}>{sub}</span>
       {infoHref && (
         <Link
           href={infoHref}

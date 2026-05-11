@@ -11,8 +11,8 @@ export default async function WeeklyShiftPage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <Navbar />
-      <main className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex items-start justify-between mb-6">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
           <div>
             <h1 className="text-xl font-bold text-white">주간 DTW 궤적</h1>
             <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>
@@ -35,7 +35,7 @@ export default async function WeeklyShiftPage() {
         </div>
 
         {/* Legend */}
-        <div className="rounded-xl border p-4 mb-6 grid grid-cols-2 gap-4 text-xs"
+        <div className="rounded-xl border p-4 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs"
              style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
           <div className="flex items-start gap-2">
             <div className="w-4 h-1 mt-1.5 rounded shrink-0" style={{ background: '#a855f7' }} />

@@ -10,7 +10,7 @@ export default async function NoticesPage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <Navbar />
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="flex items-baseline justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold text-white">공지사항</h1>
