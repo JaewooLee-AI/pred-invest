@@ -23,7 +23,7 @@ export default function UploadCsvPage() {
     <div className="p-8 max-w-3xl">
       <h1 className="text-xl font-bold text-white mb-1">CSV 데이터 업로드</h1>
       <p className="text-xs mb-6" style={{ color: 'var(--muted)' }}>
-        0424_class_total.csv 형식의 파일과 기준일, 자산별 코멘트를 업로드합니다.
+        0424_class_total.csv 형식의 파일과 분류모델 기준일, 자산별 코멘트를 업로드합니다.
       </p>
 
       <form action={handleSubmit} className="flex flex-col gap-5">
@@ -57,7 +57,7 @@ export default function UploadCsvPage() {
             </div>
             <div>
               <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--muted)' }}>
-                기준일 *
+                분류모델 기준일 *
               </label>
               <input
                 name="referenceDate"

@@ -24,7 +24,7 @@ export function WeeklyShiftGallery({ assets, label }: WeeklyShiftGalleryProps) {
   return (
     <>
       <p className="text-xs mb-4 font-mono" style={{ color: 'var(--muted)' }}>
-        기준 주차: {label}
+        DTW 기준일: {label}
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {assets.filter(a => a.imagePath).map(asset => (

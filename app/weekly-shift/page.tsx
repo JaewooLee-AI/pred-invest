@@ -69,7 +69,7 @@ export default async function WeeklyShiftPage() {
                 <div className="flex items-center gap-3 mb-4">
                   <span className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-purple)' }} />
                   <h2 className="text-sm font-semibold text-white">
-                    Week of {shift.label}
+                    DTW 기준일: {shift.label}
                   </h2>
                   <span className="text-xs font-mono" style={{ color: 'var(--muted)' }}>
                     {new Date(shift.uploadedAt).toLocaleDateString('ko-KR')}

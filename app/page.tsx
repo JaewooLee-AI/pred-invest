@@ -22,7 +22,7 @@ export default async function DashboardPage() {
         {/* Hero / Status Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
           <StatCard
-            label="기준일"
+            label="분류모델 기준일"
             value={csvData?.referenceDate ?? '—'}
             color="var(--accent-amber)"
             sub={csvData ? `업로드: ${new Date(csvData.uploadedAt).toLocaleDateString('ko-KR')}` : '데이터 없음'}
