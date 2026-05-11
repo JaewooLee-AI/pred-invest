@@ -18,40 +18,32 @@ export function Navbar() {
 
   return (
     <nav
-      className="sticky top-0 z-50"
-      style={{
-        background: 'rgba(0,0,0,0.75)',
-        backdropFilter: 'blur(24px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-      }}
+      className="sticky top-0 z-50 bg-white"
+      style={{ borderBottom: '1px solid #e4e4e7' }}
     >
-      <div className="max-w-[1200px] mx-auto flex items-center justify-between px-5 sm:px-8 h-11">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 h-12">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span
-            className="text-sm font-semibold tracking-tight"
-            style={{
-              background: 'linear-gradient(135deg, #f5f5f7 0%, rgba(245,245,247,0.65) 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            CrossAsset
-          </span>
+        <Link
+          href="/"
+          className="text-sm font-bold text-zinc-900 tracking-tight"
+          onClick={() => setOpen(false)}
+        >
+          CrossAsset
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden sm:flex items-center gap-7">
+        <div className="hidden sm:flex items-center gap-6">
           {navLinks.map(({ href, label }) => {
             const active = pathname === href
             return (
               <Link
                 key={href}
                 href={href}
-                className="text-xs transition-all duration-150"
-                style={{ color: active ? '#f5f5f7' : '#86868b', fontWeight: active ? 500 : 400 }}
+                className="text-xs transition-colors"
+                style={{
+                  color: active ? '#09090b' : '#71717a',
+                  fontWeight: active ? 600 : 400,
+                }}
               >
                 {label}
               </Link>
@@ -59,11 +51,11 @@ export function Navbar() {
           })}
           <Link
             href="/admin"
-            className="text-xs px-3.5 py-1.5 rounded-full transition-all duration-150 hover:opacity-80"
+            className="text-xs px-3 py-1.5 rounded-lg transition-colors hover:bg-zinc-100"
             style={{
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: '#86868b',
+              background: '#fafafa',
+              border: '1px solid #e4e4e7',
+              color: '#71717a',
             }}
           >
             관리자
@@ -77,16 +69,16 @@ export function Navbar() {
           aria-label={open ? '메뉴 닫기' : '메뉴 열기'}
         >
           <span
-            className="w-[18px] h-[1.5px] rounded-full transition-all duration-200"
-            style={{ background: '#86868b', transform: open ? 'translateY(6.5px) rotate(45deg)' : 'none' }}
+            className="w-[18px] h-[1.5px] rounded-full bg-zinc-500 transition-all duration-200"
+            style={{ transform: open ? 'translateY(6.5px) rotate(45deg)' : 'none' }}
           />
           <span
-            className="w-[18px] h-[1.5px] rounded-full transition-all duration-200"
-            style={{ background: '#86868b', opacity: open ? 0 : 1 }}
+            className="w-[18px] h-[1.5px] rounded-full bg-zinc-500 transition-all duration-200"
+            style={{ opacity: open ? 0 : 1 }}
           />
           <span
-            className="w-[18px] h-[1.5px] rounded-full transition-all duration-200"
-            style={{ background: '#86868b', transform: open ? 'translateY(-6.5px) rotate(-45deg)' : 'none' }}
+            className="w-[18px] h-[1.5px] rounded-full bg-zinc-500 transition-all duration-200"
+            style={{ transform: open ? 'translateY(-6.5px) rotate(-45deg)' : 'none' }}
           />
         </button>
       </div>
@@ -94,8 +86,8 @@ export function Navbar() {
       {/* Mobile dropdown */}
       {open && (
         <div
-          className="sm:hidden px-4 pb-3 flex flex-col gap-0.5"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+          className="sm:hidden bg-white px-4 pb-3 flex flex-col gap-0.5"
+          style={{ borderTop: '1px solid #e4e4e7' }}
         >
           {navLinks.map(({ href, label }) => {
             const active = pathname === href
@@ -104,22 +96,22 @@ export function Navbar() {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="flex items-center px-3 py-3 rounded-xl text-sm transition-all"
+                className="flex items-center px-3 py-2.5 rounded-lg text-sm transition-colors hover:bg-zinc-50"
                 style={{
-                  color: active ? '#f5f5f7' : '#86868b',
-                  background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  color: active ? '#09090b' : '#71717a',
+                  fontWeight: active ? 600 : 400,
+                  background: active ? '#fafafa' : undefined,
                 }}
               >
                 {label}
               </Link>
             )
           })}
-          <div className="my-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+          <div className="my-1 border-t border-zinc-100" />
           <Link
             href="/admin"
             onClick={() => setOpen(false)}
-            className="flex items-center px-3 py-3 rounded-xl text-sm"
-            style={{ color: '#86868b' }}
+            className="flex items-center px-3 py-2.5 rounded-lg text-sm text-zinc-500 hover:bg-zinc-50 transition-colors"
           >
             관리자
           </Link>

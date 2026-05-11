@@ -1,33 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  /* Apple dark mode system */
-  --bg: #000000;
-  --bg-secondary: #0a0a0a;
-  --card: rgba(255,255,255,0.04);
-  --card-solid: #1c1c1e;
-  --card-elevated: rgba(255,255,255,0.07);
-  --card-hover: rgba(255,255,255,0.06);
-  --border: rgba(255,255,255,0.08);
-  --border-strong: rgba(255,255,255,0.16);
-  --text: #f5f5f7;
-  --muted: #86868b;
-  --muted-2: #3a3a3c;
+  --bg: #ffffff;
+  --bg-muted: #fafafa;
+  --card: #ffffff;
+  --card-hover: #fafafa;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+  --text: #09090b;
+  --muted: #71717a;
+  --muted-light: #a1a1aa;
 
-  /* Apple system colors */
-  --apple-blue: #2997ff;
-  --apple-purple: #bf5af2;
-  --apple-green: #30d158;
-  --apple-orange: #ff9f0a;
-  --apple-red: #ff453a;
-  --apple-teal: #5ac8fa;
-  --apple-indigo: #5e5ce6;
+  /* Semantic accent colors (for light bg) */
+  --accent-blue: #2563eb;
+  --accent-purple: #7c3aed;
+  --accent-emerald: #16a34a;
+  --accent-amber: #d97706;
+  --accent-red: #dc2626;
 
-  /* Legacy aliases */
-  --accent-blue: var(--apple-blue);
-  --accent-purple: var(--apple-purple);
-  --accent-emerald: var(--apple-green);
-  --accent-amber: var(--apple-orange);
+  /* Tint pairs (bg / border / text) */
+  --blue-bg: #eff6ff;
+  --blue-bd: #bfdbfe;
+  --blue-tx: #1d4ed8;
+
+  --purple-bg: #f5f3ff;
+  --purple-bd: #ddd6fe;
+  --purple-tx: #6d28d9;
+
+  --green-bg: #f0fdf4;
+  --green-bd: #bbf7d0;
+  --green-tx: #15803d;
+
+  --amber-bg: #fffbeb;
+  --amber-bd: #fde68a;
+  --amber-tx: #b45309;
+
+  --red-bg: #fef2f2;
+  --red-bd: #fecaca;
+  --red-tx: #b91c1c;
 }
 
 @theme inline {
@@ -37,30 +47,19 @@
   --color-border: var(--border);
   --color-muted: var(--muted);
   --font-sans: -apple-system, BlinkMacSystemFont, var(--font-geist-sans), 'Helvetica Neue', sans-serif;
-  --font-mono: 'SF Mono', ui-monospace, var(--font-geist-mono), monospace;
+  --font-mono: ui-monospace, 'SF Mono', var(--font-geist-mono), monospace;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   font-family: -apple-system, BlinkMacSystemFont, var(--font-geist-sans), 'Helvetica Neue', Arial, sans-serif;
 }
 
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.12);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.22);
-}
+::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }

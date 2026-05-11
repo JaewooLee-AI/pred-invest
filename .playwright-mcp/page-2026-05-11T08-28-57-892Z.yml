@@ -1,0 +1,69 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - link "◈ CrossAsset" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e6]: ◈
+          - generic [ref=e7]: CrossAsset
+        - paragraph [ref=e8]: Admin
+      - navigation [ref=e9]:
+        - link "대시보드" [ref=e10] [cursor=pointer]:
+          - /url: /admin
+        - link "CSV 업로드" [ref=e11] [cursor=pointer]:
+          - /url: /admin/upload-csv
+        - link "주간 궤적 업로드" [ref=e12] [cursor=pointer]:
+          - /url: /admin/weekly-shift
+        - link "공지사항 업로드" [ref=e13] [cursor=pointer]:
+          - /url: /admin/notice
+      - button "로그아웃" [ref=e16]
+    - main [ref=e17]:
+      - generic [ref=e18]:
+        - heading "CSV 데이터 업로드" [level=1] [ref=e19]
+        - paragraph [ref=e20]: 0424_class_total.csv 형식의 파일과 기준일, 자산별 코멘트를 업로드합니다.
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - heading "기본 정보" [level=2] [ref=e23]
+            - generic [ref=e24]:
+              - generic [ref=e25]:
+                - generic [ref=e26]: CSV 파일 *
+                - button "Choose File" [ref=e27]
+                - paragraph [ref=e72]: 파일 선택됨
+              - generic [ref=e28]:
+                - generic [ref=e29]: 기준일 *
+                - textbox [ref=e30]
+          - generic [ref=e31]:
+            - heading "자산별 코멘트 (9개 자산군)" [level=2] [ref=e32]
+            - generic [ref=e33]:
+              - generic [ref=e34]:
+                - generic [ref=e35]: S&P500
+                - textbox "S&P500 시장 분석 코멘트를 입력하세요..." [ref=e36]
+              - generic [ref=e37]:
+                - generic [ref=e38]: NASDAQ
+                - textbox "NASDAQ 시장 분석 코멘트를 입력하세요..." [ref=e39]
+              - generic [ref=e40]:
+                - generic [ref=e41]: KOSPI
+                - textbox "KOSPI 시장 분석 코멘트를 입력하세요..." [ref=e42]
+              - generic [ref=e43]:
+                - generic [ref=e44]: GOLD
+                - textbox "GOLD 시장 분석 코멘트를 입력하세요..." [ref=e45]
+              - generic [ref=e46]:
+                - generic [ref=e47]: DXY
+                - textbox "DXY 시장 분석 코멘트를 입력하세요..." [ref=e48]
+              - generic [ref=e49]:
+                - generic [ref=e50]: USDKRW
+                - textbox "USDKRW 시장 분석 코멘트를 입력하세요..." [ref=e51]
+              - generic [ref=e52]:
+                - generic [ref=e53]: USDJPY
+                - textbox "USDJPY 시장 분석 코멘트를 입력하세요..." [ref=e54]
+              - generic [ref=e55]:
+                - generic [ref=e56]: 10YUSB
+                - textbox "10YUSB 시장 분석 코멘트를 입력하세요..." [ref=e57]
+              - generic [ref=e58]:
+                - generic [ref=e59]: WTI
+                - textbox "WTI 시장 분석 코멘트를 입력하세요..." [ref=e60]
+          - generic [ref=e73]: CSV 데이터가 성공적으로 업로드되었습니다.
+          - button "업로드 완료" [ref=e61]
+  - button "Open Next.js Dev Tools" [ref=e67] [cursor=pointer]:
+    - img [ref=e68]
+  - alert [ref=e71]

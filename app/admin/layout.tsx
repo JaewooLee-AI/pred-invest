@@ -10,29 +10,16 @@ const adminNav = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex" style={{ background: '#000' }}>
+    <div className="min-h-screen flex bg-white">
       <aside
-        className="w-52 shrink-0 flex flex-col"
-        style={{
-          background: 'rgba(255,255,255,0.03)',
-          borderRight: '1px solid rgba(255,255,255,0.07)',
-        }}
+        className="w-52 shrink-0 flex flex-col bg-zinc-50"
+        style={{ borderRight: '1px solid #e4e4e7' }}
       >
-        <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <Link href="/" className="flex items-center gap-2">
-            <span
-              className="text-sm font-semibold tracking-tight"
-              style={{
-                background: 'linear-gradient(135deg, #f5f5f7 0%, rgba(245,245,247,0.6) 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              CrossAsset
-            </span>
+        <div className="px-5 py-4" style={{ borderBottom: '1px solid #e4e4e7' }}>
+          <Link href="/" className="text-sm font-bold text-zinc-900 tracking-tight">
+            CrossAsset
           </Link>
-          <p className="text-xs mt-0.5" style={{ color: '#3a3a3c' }}>Admin</p>
+          <p className="text-xs mt-0.5 text-zinc-400 font-mono">Admin</p>
         </div>
 
         <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5">
@@ -40,20 +27,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link
               key={href}
               href={href}
-              className="px-3 py-2 text-xs rounded-xl transition-all hover:opacity-80"
-              style={{ color: '#86868b', background: 'transparent' }}
+              className="px-3 py-2 text-xs rounded-lg transition-colors text-zinc-500 hover:text-zinc-900 hover:bg-white"
             >
               {label}
             </Link>
           ))}
         </nav>
 
-        <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="px-3 py-4" style={{ borderTop: '1px solid #e4e4e7' }}>
           <form action={logoutAction}>
             <button
               type="submit"
-              className="w-full px-3 py-2 text-xs rounded-xl transition-all hover:opacity-80 text-left"
-              style={{ color: '#ff453a' }}
+              className="w-full px-3 py-2 text-xs rounded-lg transition-colors text-red-500 hover:bg-red-50 hover:text-red-600 text-left"
             >
               로그아웃
             </button>
@@ -61,7 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto bg-white">
         {children}
       </main>
     </div>

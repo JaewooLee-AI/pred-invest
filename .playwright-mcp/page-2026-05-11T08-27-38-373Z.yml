@@ -1,0 +1,74 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e22] [cursor=pointer]:
+    - img [ref=e23]
+  - alert [ref=e26]
+  - generic [ref=e27]:
+    - complementary [ref=e28]:
+      - generic [ref=e29]:
+        - link "◈ CrossAsset" [ref=e30] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e31]: ◈
+          - generic [ref=e32]: CrossAsset
+        - paragraph [ref=e33]: Admin
+      - navigation [ref=e34]:
+        - link "대시보드" [ref=e35] [cursor=pointer]:
+          - /url: /admin
+        - link "CSV 업로드" [ref=e36] [cursor=pointer]:
+          - /url: /admin/upload-csv
+        - link "주간 궤적 업로드" [ref=e37] [cursor=pointer]:
+          - /url: /admin/weekly-shift
+        - link "공지사항 업로드" [ref=e38] [cursor=pointer]:
+          - /url: /admin/notice
+      - button "로그아웃" [ref=e41]
+    - main [ref=e42]:
+      - generic [ref=e43]:
+        - heading "관리자 대시보드" [level=1] [ref=e44]
+        - paragraph [ref=e45]: 데이터 업로드 및 관리
+        - generic [ref=e46]:
+          - link "CSV 업로드 0 / 최대 50개 보관" [ref=e47] [cursor=pointer]:
+            - /url: /admin/upload-csv
+            - generic [ref=e48]:
+              - paragraph [ref=e49]: CSV 업로드
+              - paragraph [ref=e50]: "0"
+              - paragraph [ref=e51]: / 최대 50개 보관
+          - link "주간 궤적 0 / 최대 50개 보관" [ref=e52] [cursor=pointer]:
+            - /url: /admin/weekly-shift
+            - generic [ref=e53]:
+              - paragraph [ref=e54]: 주간 궤적
+              - paragraph [ref=e55]: "0"
+              - paragraph [ref=e56]: / 최대 50개 보관
+          - link "공지사항 0 / 최대 50개 보관" [ref=e57] [cursor=pointer]:
+            - /url: /admin/notice
+            - generic [ref=e58]:
+              - paragraph [ref=e59]: 공지사항
+              - paragraph [ref=e60]: "0"
+              - paragraph [ref=e61]: / 최대 50개 보관
+        - generic [ref=e62]:
+          - link "📊 CSV 업로드 자산군 상승 확률 데이터 업로드" [ref=e63] [cursor=pointer]:
+            - /url: /admin/upload-csv
+            - generic [ref=e64]:
+              - generic [ref=e65]: 📊
+              - generic [ref=e66]:
+                - paragraph [ref=e67]: CSV 업로드
+                - paragraph [ref=e68]: 자산군 상승 확률 데이터 업로드
+          - link "📈 주간 궤적 업로드 DTW 롤링 시프트 이미지 업로드" [ref=e69] [cursor=pointer]:
+            - /url: /admin/weekly-shift
+            - generic [ref=e70]:
+              - generic [ref=e71]: 📈
+              - generic [ref=e72]:
+                - paragraph [ref=e73]: 주간 궤적 업로드
+                - paragraph [ref=e74]: DTW 롤링 시프트 이미지 업로드
+          - link "📄 공지사항 업로드 PDF 공지사항 및 설명 업로드" [ref=e75] [cursor=pointer]:
+            - /url: /admin/notice
+            - generic [ref=e76]:
+              - generic [ref=e77]: 📄
+              - generic [ref=e78]:
+                - paragraph [ref=e79]: 공지사항 업로드
+                - paragraph [ref=e80]: PDF 공지사항 및 설명 업로드
+          - link "👁️ 사용자 화면 보기 메인 대시보드 미리보기" [ref=e81] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e82]:
+              - generic [ref=e83]: 👁️
+              - generic [ref=e84]:
+                - paragraph [ref=e85]: 사용자 화면 보기
+                - paragraph [ref=e86]: 메인 대시보드 미리보기

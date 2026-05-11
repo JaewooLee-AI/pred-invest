@@ -13,10 +13,14 @@ interface Props {
 
 function ProbBadge({ avg }: { avg: string }) {
   const v = parseFloat(avg)
-  const color = v >= 60 ? '#10b981' : v >= 40 ? '#f59e0b' : '#ef4444'
-  const bg = v >= 60 ? 'rgba(16,185,129,0.15)' : v >= 40 ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)'
+  const styles =
+    v >= 60
+      ? { color: '#15803d', background: '#f0fdf4', border: '1px solid #bbf7d0' }
+      : v >= 40
+      ? { color: '#b45309', background: '#fffbeb', border: '1px solid #fde68a' }
+      : { color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca' }
   return (
-    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded" style={{ color, background: bg }}>
+    <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full" style={styles}>
       {avg}%
     </span>
   )
@@ -26,21 +30,28 @@ function AssetCardContent({ asset, data, comment }: { asset: string; data: DataP
   const latest = data[data.length - 1]
   const avgProb = latest ? ((latest.A + latest.B + latest.C) / 3).toFixed(1) : null
   return (
-    <div className="rounded-xl border p-4 h-full" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+    <div
+      className="rounded-xl border h-full p-4"
+      style={{
+        background: '#fff',
+        borderColor: '#e4e4e7',
+        boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.04)',
+      }}
+    >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white">{asset}</h3>
+        <h3 className="text-sm font-semibold text-zinc-900">{asset}</h3>
         {avgProb && <ProbBadge avg={avgProb} />}
       </div>
       {data.length > 0 ? (
         <AssetChart asset={asset} data={data} />
       ) : (
-        <div className="h-44 flex items-center justify-center text-xs" style={{ color: 'var(--muted)' }}>
+        <div className="h-44 flex items-center justify-center text-xs text-zinc-400">
           데이터 없음
         </div>
       )}
       {comment && (
-        <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
-          <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>{comment}</p>
+        <div className="mt-3 pt-3 border-t border-zinc-100">
+          <p className="text-xs leading-relaxed text-zinc-500">{comment}</p>
         </div>
       )}
     </div>
@@ -73,7 +84,7 @@ export function ChartCarousel({ chartData, assetComments }: Props) {
 
   return (
     <>
-      {/* ── Mobile: horizontal snap carousel ── */}
+      {/* Mobile: snap carousel */}
       <div className="sm:hidden -mx-4">
         <div
           ref={scrollRef}
@@ -81,11 +92,7 @@ export function ChartCarousel({ chartData, assetComments }: Props) {
           style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
         >
           {ASSET_NAMES.map(asset => (
-            <div
-              key={asset}
-              className="snap-start shrink-0 px-4"
-              style={{ width: '100vw' }}
-            >
+            <div key={asset} className="snap-start shrink-0 px-4" style={{ width: '100vw' }}>
               <AssetCardContent
                 asset={asset}
                 data={chartData[asset] ?? []}
@@ -94,10 +101,8 @@ export function ChartCarousel({ chartData, assetComments }: Props) {
             </div>
           ))}
         </div>
-
-        {/* Progress counter + dots */}
         <div className="flex flex-col items-center gap-2 mt-3">
-          <span className="text-xs font-mono" style={{ color: 'var(--muted)' }}>
+          <span className="text-xs font-mono text-zinc-400">
             {current + 1} / {ASSET_NAMES.length}
           </span>
           <div className="flex gap-1.5">
@@ -110,7 +115,7 @@ export function ChartCarousel({ chartData, assetComments }: Props) {
                   width: i === current ? '1.25rem' : '0.375rem',
                   height: '0.375rem',
                   borderRadius: '999px',
-                  background: i === current ? '#a855f7' : '#3f3f46',
+                  background: i === current ? '#7c3aed' : '#e4e4e7',
                   transition: 'all 0.2s',
                   border: 'none',
                   padding: 0,
@@ -122,7 +127,7 @@ export function ChartCarousel({ chartData, assetComments }: Props) {
         </div>
       </div>
 
-      {/* ── Desktop: 3-column grid ── */}
+      {/* Desktop: 3-column grid */}
       <div className="hidden sm:grid sm:grid-cols-3 gap-4">
         {ASSET_NAMES.map(asset => (
           <AssetCardContent

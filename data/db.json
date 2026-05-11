@@ -3421,5 +3421,13 @@
       ]
     }
   ],
-  "notices": []
+  "notices": [
+    {
+      "id": "e772f259-be40-4361-8eaf-d91771c78db8",
+      "uploadedAt": "2026-05-11T09:11:33.059Z",
+      "filename": "TOTAL_20260424_A.pdf",
+      "filePath": "/uploads/pdf/1778490692864_TOTAL_20260424_A.pdf",
+      "description": "내용을 추출할 수 없습니다."
+    }
+  ]
 }

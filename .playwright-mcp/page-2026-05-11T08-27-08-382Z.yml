@@ -1,0 +1,58 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "◈ CrossAsset" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: ◈
+        - generic [ref=e6]: CrossAsset
+      - generic [ref=e7]:
+        - link "대시보드" [ref=e8] [cursor=pointer]:
+          - /url: /
+        - link "주간 궤적" [ref=e9] [cursor=pointer]:
+          - /url: /weekly-shift
+        - link "공지사항" [ref=e10] [cursor=pointer]:
+          - /url: /notices
+        - link "관리자" [ref=e11] [cursor=pointer]:
+          - /url: /admin
+    - main [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - paragraph [ref=e15]: 기준일
+          - paragraph [ref=e16]: —
+          - paragraph [ref=e17]: 데이터 없음
+        - generic [ref=e18]:
+          - paragraph [ref=e19]: 주간 궤적
+          - paragraph [ref=e20]: —
+          - paragraph [ref=e21]: 데이터 없음
+        - generic [ref=e22]:
+          - paragraph [ref=e23]: 공지사항
+          - paragraph [ref=e24]: 0건
+          - paragraph [ref=e25]: 최신 공지 목록
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - heading "다중 자산군 상승 확률" [level=2] [ref=e29]
+            - generic [ref=e30]: A·B·C 모델 3종 — 50주 예측 시계열
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: 업로드된 CSV 데이터가 없습니다.
+            - link "관리자 페이지에서 CSV를 업로드하세요." [ref=e33] [cursor=pointer]:
+              - /url: /admin/upload-csv
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - heading "주간 DTW 궤적" [level=2] [ref=e36]
+            - generic [ref=e37]: 현재 시장과 가장 유사한 과거 궤적 투사
+          - generic [ref=e38]:
+            - paragraph [ref=e39]: 주간 궤적 데이터가 없습니다.
+            - link "관리자 페이지에서 이미지를 업로드하세요." [ref=e40] [cursor=pointer]:
+              - /url: /admin/weekly-shift
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - heading "공지사항" [level=2] [ref=e43]
+            - generic [ref=e44]: 최신 분석 리포트
+          - generic [ref=e45]:
+            - paragraph [ref=e46]: 공지사항이 없습니다.
+            - link "관리자 페이지에서 PDF를 업로드하세요." [ref=e47] [cursor=pointer]:
+              - /url: /admin/notice
+  - button "Open Next.js Dev Tools" [ref=e53] [cursor=pointer]:
+    - img [ref=e54]
+  - alert [ref=e57]
