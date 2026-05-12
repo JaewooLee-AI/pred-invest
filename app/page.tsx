@@ -1,13 +1,15 @@
 import { Navbar } from '@/components/Navbar'
 import { ChartCarousel } from '@/components/charts/ChartCarousel'
-import { getLatestCsvUpload, getAllNotices, getLatestWeeklyShift } from '@/lib/db'
+import { ProbIndexCarousel } from '@/components/charts/ProbIndexCarousel'
+import { getLatestCsvUpload, getAllNotices, getLatestWeeklyShift, getLatestProbUpload } from '@/lib/db'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
-  const [csvData, notices, weeklyShift] = await Promise.all([
+  const [csvData, probData, notices, weeklyShift] = await Promise.all([
     getLatestCsvUpload(),
+    getLatestProbUpload(),
     getAllNotices(),
     getLatestWeeklyShift(),
   ])
@@ -30,12 +32,20 @@ export default async function DashboardPage() {
               </p>
             </div>
             <div className="flex items-center gap-2 mt-1">
-              {csvData && (
+              {probData && (
                 <span
                   className="text-xs font-mono px-2.5 py-1 rounded-full"
                   style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309' }}
                 >
-                  기준일 {csvData.referenceDate}
+                  예측 기준일 {probData.referenceDate}
+                </span>
+              )}
+              {csvData && (
+                <span
+                  className="text-xs font-mono px-2.5 py-1 rounded-full"
+                  style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1d4ed8' }}
+                >
+                  분류 기준일 {csvData.referenceDate}
                 </span>
               )}
             </div>
@@ -69,6 +79,32 @@ export default async function DashboardPage() {
             />
           </div>
         </div>
+
+        {/* Divider */}
+        <div className="border-t border-zinc-100 mb-10" />
+
+        {/* Prob & Index charts section */}
+        <section className="mb-12">
+          <SectionHeader
+            title="예측 확률 & 예상 지수"
+            sub="자산별 상승 확률(점선) · 예상 지수(실선) 주간 예측"
+            badge="Prob/Index"
+            badgeColor="#b45309"
+            badgeBg="#fffbeb"
+            badgeBd="#fde68a"
+            href="/admin/upload-prob"
+            hrefLabel="데이터 업로드 →"
+          />
+          {probData ? (
+            <ProbIndexCarousel probData={probData.probData} />
+          ) : (
+            <EmptyState
+              msg="업로드된 확률/지수 데이터가 없습니다."
+              cta="관리자 페이지에서 CSV를 업로드하세요."
+              href="/admin/upload-prob"
+            />
+          )}
+        </section>
 
         {/* Divider */}
         <div className="border-t border-zinc-100 mb-10" />

@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import type { ProbIndexPoint } from './prob-index-parser'
 
 export interface AssetComment {
   [asset: string]: string
@@ -10,6 +11,13 @@ export interface CsvUpload {
   referenceDate: string
   chartData: Record<string, Array<{ date: string; A: number; B: number; C: number }>>
   assetComments: AssetComment
+}
+
+export interface ProbUpload {
+  id: string
+  uploadedAt: string
+  referenceDate: string
+  probData: Record<string, ProbIndexPoint[]>
 }
 
 export interface AssetShift {
@@ -139,6 +147,41 @@ export async function getAllWeeklyShifts(): Promise<WeeklyShift[]> {
     label: r.label,
     assets: r.assets,
   }))
+}
+
+export async function addProbUpload(upload: ProbUpload): Promise<void> {
+  const { error } = await supabase.from('pred_invest_prob_uploads').upsert({
+    id: upload.id,
+    uploaded_at: upload.uploadedAt,
+    reference_date: upload.referenceDate,
+    prob_data: upload.probData,
+  })
+  if (error) throw error
+
+  const { data: old } = await supabase
+    .from('pred_invest_prob_uploads')
+    .select('id')
+    .order('uploaded_at', { ascending: false })
+    .range(50, 9999)
+  if (old?.length) {
+    await supabase.from('pred_invest_prob_uploads').delete().in('id', old.map(r => r.id))
+  }
+}
+
+export async function getLatestProbUpload(): Promise<ProbUpload | null> {
+  const { data } = await supabase
+    .from('pred_invest_prob_uploads')
+    .select('*')
+    .order('uploaded_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (!data) return null
+  return {
+    id: data.id,
+    uploadedAt: data.uploaded_at,
+    referenceDate: data.reference_date,
+    probData: data.prob_data,
+  }
 }
 
 export async function getAllNotices(): Promise<Notice[]> {

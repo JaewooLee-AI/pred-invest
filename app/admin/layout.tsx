@@ -4,6 +4,7 @@ import { logoutAction } from '@/app/actions/auth'
 const adminNav = [
   { href: '/admin', label: '대시보드' },
   { href: '/admin/upload-csv', label: 'CSV 업로드' },
+  { href: '/admin/upload-prob', label: '확률/지수 업로드' },
   { href: '/admin/weekly-shift', label: '주간 궤적 업로드' },
   { href: '/admin/notice', label: '공지사항 업로드' },
 ]

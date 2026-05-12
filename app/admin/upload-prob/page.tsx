@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { uploadCsvAction } from '@/app/actions/csv-upload'
-import { ASSET_NAMES } from '@/lib/csv-parser'
+import { uploadProbAction } from '@/app/actions/prob-upload'
+import { PROB_ASSET_NAMES } from '@/lib/prob-index-parser'
 
-export default function UploadCsvPage() {
+export default function UploadProbPage() {
   const [isPending, setIsPending] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
@@ -14,9 +14,9 @@ export default function UploadCsvPage() {
     setIsPending(true)
     try {
       const formData = new FormData(e.currentTarget)
-      const result = await uploadCsvAction(formData)
+      const result = await uploadProbAction(formData)
       if (result.error) setMessage({ type: 'error', text: result.error })
-      else setMessage({ type: 'success', text: 'CSV 데이터가 성공적으로 업로드되었습니다.' })
+      else setMessage({ type: 'success', text: '확률/지수 CSV 데이터가 성공적으로 업로드되었습니다.' })
     } catch (err) {
       setMessage({ type: 'error', text: `업로드 실패: ${err instanceof Error ? err.message : String(err)}` })
     } finally {
@@ -26,19 +26,31 @@ export default function UploadCsvPage() {
 
   return (
     <div className="p-8 max-w-3xl">
-      <h1 className="text-xl font-bold text-zinc-900 mb-1">CSV 데이터 업로드</h1>
+      <h1 className="text-xl font-bold text-zinc-900 mb-1">확률 & 예상 지수 CSV 업로드</h1>
       <p className="text-xs mb-6 text-zinc-500">
-        0424_class_total.csv 형식의 파일과 분류모델 기준일, 자산별 코멘트를 업로드합니다.
+        컬럼 형식: <code className="font-mono bg-zinc-100 px-1 rounded">Date, 자산_Prob, 자산_Index</code> — 9개 자산군 (S&P500, NASDAQ, KOSPI, GOLD, DXY, USDKRW, USDJPY, 10YUSB, WTI)
       </p>
+
+      <div className="rounded-xl border p-4 mb-5 text-xs" style={{ background: '#fffbeb', borderColor: '#fde68a' }}>
+        <p className="font-semibold text-amber-700 mb-2">예시 컬럼명</p>
+        <p className="font-mono text-amber-600 leading-relaxed break-all">
+          Date, S&P500_Prob, S&P500_Index, NASDAQ_Prob, NASDAQ_Index, KOSPI_Prob, KOSPI_Index, GOLD_Prob, GOLD_Index, DXY_Prob, DXY_Index, USDKRW_Prob, USDKRW_Index, USDJPY_Prob, USDJPY_Index, 10YUSB_Prob, 10YUSB_Index, WTI_Prob, WTI_Index
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {PROB_ASSET_NAMES.map(a => (
+            <span key={a} className="px-2 py-0.5 rounded font-mono text-[10px] bg-amber-100 text-amber-700">{a}</span>
+          ))}
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="rounded-xl border border-zinc-200 p-5 bg-white">
-          <h2 className="text-sm font-semibold text-zinc-900 mb-4">기본 정보</h2>
+          <h2 className="text-sm font-semibold text-zinc-900 mb-4">업로드 정보</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-xs font-medium mb-1.5 text-zinc-500">CSV 파일 *</p>
               <input
-                name="csvFile"
+                name="probFile"
                 type="file"
                 accept=".csv"
                 required
@@ -47,9 +59,7 @@ export default function UploadCsvPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1.5 text-zinc-500">
-                분류모델 기준일 *
-              </label>
+              <label className="block text-xs font-medium mb-1.5 text-zinc-500">기준일 *</label>
               <input
                 name="referenceDate"
                 type="date"
@@ -58,26 +68,6 @@ export default function UploadCsvPage() {
                 style={{ background: '#f9fafb', borderColor: '#e4e4e7' }}
               />
             </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-zinc-200 p-5 bg-white">
-          <h2 className="text-sm font-semibold text-zinc-900 mb-4">자산별 코멘트 (9개 자산군)</h2>
-          <div className="grid grid-cols-1 gap-3">
-            {ASSET_NAMES.map(asset => (
-              <div key={asset}>
-                <label className="block text-xs font-semibold mb-1 text-blue-600">
-                  {asset}
-                </label>
-                <textarea
-                  name={`comment_${asset}`}
-                  rows={2}
-                  placeholder={`${asset} 시장 분석 코멘트를 입력하세요...`}
-                  className="w-full rounded-lg border px-3 py-2 text-xs text-zinc-900 outline-none focus:border-blue-500 transition-colors resize-none"
-                  style={{ background: '#f9fafb', borderColor: '#e4e4e7' }}
-                />
-              </div>
-            ))}
           </div>
         </div>
 
