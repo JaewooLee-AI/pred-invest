@@ -43,7 +43,10 @@ export interface Notice {
 }
 
 export async function addCsvUpload(upload: CsvUpload): Promise<void> {
-  const { error } = await supabase.from('pred_invest_csv_uploads').upsert({
+  // referenceDate를 키로 사용: 동일 기준일 재업로드 시 덮어씀
+  await supabase.from('pred_invest_csv_uploads').delete().eq('reference_date', upload.referenceDate)
+
+  const { error } = await supabase.from('pred_invest_csv_uploads').insert({
     id: upload.id,
     uploaded_at: upload.uploadedAt,
     reference_date: upload.referenceDate,
@@ -52,7 +55,6 @@ export async function addCsvUpload(upload: CsvUpload): Promise<void> {
   })
   if (error) throw error
 
-  // Keep only 50 most recent
   const { data: old } = await supabase
     .from('pred_invest_csv_uploads')
     .select('id')
@@ -154,7 +156,10 @@ export async function getAllWeeklyShifts(): Promise<WeeklyShift[]> {
 }
 
 export async function addProbUpload(upload: ProbUpload): Promise<void> {
-  const { error } = await supabase.from('pred_invest_prob_uploads').upsert({
+  // referenceDate를 키로 사용: 동일 기준일 재업로드 시 덮어씀
+  await supabase.from('pred_invest_prob_uploads').delete().eq('reference_date', upload.referenceDate)
+
+  const { error } = await supabase.from('pred_invest_prob_uploads').insert({
     id: upload.id,
     uploaded_at: upload.uploadedAt,
     reference_date: upload.referenceDate,
@@ -170,6 +175,37 @@ export async function addProbUpload(upload: ProbUpload): Promise<void> {
   if (old?.length) {
     await supabase.from('pred_invest_prob_uploads').delete().in('id', old.map(r => r.id))
   }
+}
+
+export async function getAllCsvUploads(): Promise<CsvUpload[]> {
+  const { data } = await supabase
+    .from('pred_invest_csv_uploads')
+    .select('*')
+    .order('uploaded_at', { ascending: false })
+    .limit(50)
+  if (!data) return []
+  return data.map(r => ({
+    id: r.id,
+    uploadedAt: r.uploaded_at,
+    referenceDate: r.reference_date,
+    chartData: r.chart_data,
+    assetComments: r.asset_comments,
+  }))
+}
+
+export async function getAllProbUploads(): Promise<ProbUpload[]> {
+  const { data } = await supabase
+    .from('pred_invest_prob_uploads')
+    .select('*')
+    .order('uploaded_at', { ascending: false })
+    .limit(50)
+  if (!data) return []
+  return data.map(r => ({
+    id: r.id,
+    uploadedAt: r.uploaded_at,
+    referenceDate: r.reference_date,
+    probData: r.prob_data,
+  }))
 }
 
 export async function getLatestProbUpload(): Promise<ProbUpload | null> {
