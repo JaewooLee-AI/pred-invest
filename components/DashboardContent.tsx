@@ -26,8 +26,17 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
 
   return (
     <>
-      {/* Stat cards with date selectors */}
+      {/* Stat cards with date selectors — 아래 섹션 순서와 동일: Prob/Index → Classification → DTW */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+        <DateStatCard
+          label="주간궤적 기준일"
+          selected={probData?.referenceDate ?? '—'}
+          dates={probUploads.map(u => u.referenceDate)}
+          onSelect={setProbKey}
+          accent="#b45309"
+          accentBg="#fffbeb"
+          accentBd="#fde68a"
+        />
         <DateStatCard
           label="분류모델 기준일"
           selected={csvData?.referenceDate ?? '—'}
@@ -45,15 +54,6 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
           accent="#7c3aed"
           accentBg="#f5f3ff"
           accentBd="#ddd6fe"
-        />
-        <DateStatCard
-          label="주간궤적 기준일"
-          selected={probData?.referenceDate ?? '—'}
-          dates={probUploads.map(u => u.referenceDate)}
-          onSelect={setProbKey}
-          accent="#b45309"
-          accentBg="#fffbeb"
-          accentBd="#fde68a"
         />
       </div>
 
