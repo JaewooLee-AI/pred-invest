@@ -1,6 +1,7 @@
 import { Navbar } from '@/components/Navbar'
 import { ChartCarousel } from '@/components/charts/ChartCarousel'
 import { ProbIndexCarousel } from '@/components/charts/ProbIndexCarousel'
+import { DtwChart } from '@/components/charts/DtwChart'
 import { getLatestCsvUpload, getAllNotices, getLatestWeeklyShift, getLatestProbUpload } from '@/lib/db'
 import Link from 'next/link'
 
@@ -64,7 +65,7 @@ export default async function DashboardPage() {
             <StatCard
               label="DTW 기준일"
               value={weeklyShift?.label ?? '—'}
-              sub={weeklyShift ? `${weeklyShift.assets.filter(a => a.imagePath).length}개 자산 이미지` : '데이터 없음'}
+              sub={weeklyShift ? `${weeklyShift.assets.filter(a => a.data?.length > 0).length}개 자산 데이터` : '데이터 없음'}
               accent="#7c3aed"
               accentBg="#f5f3ff"
               accentBd="#ddd6fe"
@@ -149,17 +150,20 @@ export default async function DashboardPage() {
               hrefLabel="DTW 안내 →"
             />
             {weeklyShift ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {weeklyShift.assets.filter(a => a.imagePath).slice(0, 3).map(asset => (
-                  <ShiftThumb key={asset.name} asset={asset} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {weeklyShift.assets.filter(a => a.data?.length > 0).slice(0, 2).map(asset => (
+                  <div key={asset.name} className="rounded-xl border border-zinc-200 bg-white p-4">
+                    <p className="text-xs font-semibold text-violet-600 mb-2">{asset.name}</p>
+                    <DtwChart data={asset.data} assetName={asset.name} />
+                  </div>
                 ))}
-                {weeklyShift.assets.filter(a => a.imagePath).length > 3 && (
-                  <Link href="/weekly-shift">
+                {weeklyShift.assets.filter(a => a.data?.length > 0).length > 2 && (
+                  <Link href="/weekly-shift" className="sm:col-span-2">
                     <div
-                      className="rounded-xl flex items-center justify-center text-sm font-medium text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 transition-colors cursor-pointer"
-                      style={{ border: '1px dashed #e4e4e7', aspectRatio: '4/3' }}
+                      className="rounded-xl flex items-center justify-center text-sm font-medium text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 transition-colors cursor-pointer py-4"
+                      style={{ border: '1px dashed #e4e4e7' }}
                     >
-                      +{weeklyShift.assets.filter(a => a.imagePath).length - 3}개 더보기
+                      +{weeklyShift.assets.filter(a => a.data?.length > 0).length - 2}개 더보기 →
                     </div>
                   </Link>
                 )}
@@ -167,7 +171,7 @@ export default async function DashboardPage() {
             ) : (
               <EmptyState
                 msg="주간 궤적 데이터가 없습니다."
-                cta="관리자 페이지에서 이미지를 업로드하세요."
+                cta="관리자 페이지에서 CSV를 업로드하세요."
                 href="/admin/weekly-shift"
               />
             )}
@@ -281,27 +285,6 @@ function SectionHeader({
   )
 }
 
-function ShiftThumb({ asset }: { asset: { name: string; imagePath: string; description: string } }) {
-  return (
-    <div
-      className="rounded-xl overflow-hidden border border-zinc-200 hover:border-zinc-300 hover:shadow-sm transition-all"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={asset.imagePath}
-        alt={asset.name}
-        className="w-full object-cover"
-        style={{ aspectRatio: '4/3' }}
-      />
-      <div className="px-3 py-2.5 bg-white">
-        <p className="text-xs font-semibold text-zinc-900">{asset.name}</p>
-        {asset.description && (
-          <p className="text-xs mt-0.5 line-clamp-2 text-zinc-500">{asset.description}</p>
-        )}
-      </div>
-    </div>
-  )
-}
 
 function EmptyState({ msg, cta, href }: { msg: string; cta: string; href: string }) {
   return (

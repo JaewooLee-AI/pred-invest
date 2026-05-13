@@ -1,5 +1,5 @@
 import { Navbar } from '@/components/Navbar'
-import { WeeklyShiftGallery } from '@/components/gallery/WeeklyShiftGallery'
+import { WeeklyShiftViewer } from '@/components/gallery/WeeklyShiftViewer'
 import { getAllWeeklyShifts } from '@/lib/db'
 import Link from 'next/link'
 
@@ -23,7 +23,6 @@ export default async function WeeklyShiftPage() {
               >
                 DTW Analysis
               </span>
-              <span className="text-xs font-mono text-zinc-400">{shifts.length}개 기록</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 tracking-tight">
               주간 DTW 궤적
@@ -41,30 +40,39 @@ export default async function WeeklyShiftPage() {
         </div>
 
         {/* Legend */}
-        <div className="rounded-xl border border-zinc-200 p-5 mb-10 grid grid-cols-1 sm:grid-cols-2 gap-5 bg-zinc-50">
+        <div className="rounded-xl border border-zinc-200 p-5 mb-10 grid grid-cols-1 sm:grid-cols-3 gap-5 bg-zinc-50">
           <div className="flex items-start gap-3">
             <div className="flex items-center gap-1.5 mt-1 shrink-0">
               <div className="w-7 h-[2.5px] rounded-full" style={{ background: '#7c3aed' }} />
-              <div className="w-2 h-2 rounded-full" style={{ background: '#7c3aed' }} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-zinc-900">보라색 실선 — Ensemble Average</p>
+              <p className="text-sm font-semibold text-zinc-900">보라색 실선 — Ensemble Master</p>
               <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
-                과거 5개 유사 국면의 평균 미래 궤적 — 기본 시나리오
+                과거 유사 국면의 앙상블 평균 미래 궤적 — 기본 시나리오
               </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="flex items-center gap-[3px] mt-1 shrink-0">
               {[0, 1, 2, 3].map(i => (
-                <div key={i} className="w-2 h-[2.5px] rounded-full" style={{ background: '#d97706' }} />
+                <div key={i} className="w-2 h-[2.5px] rounded-full" style={{ background: '#eab308' }} />
               ))}
-              <div className="w-2 h-2 rounded-full ml-0.5" style={{ background: '#d97706' }} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-zinc-900">주황 점선 — Rank 1 Trajectory</p>
+              <p className="text-sm font-semibold text-zinc-900">노란색 점선 — Rank 1</p>
               <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
                 역사상 가장 유사한 단일 궤적 — 꼬리 위험(Tail Risk) 지표
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="flex items-center gap-1.5 mt-1 shrink-0">
+              <div className="w-7 h-[2.5px] rounded-full" style={{ background: '#18181b' }} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-900">검은색 실선 — Current Level</p>
+              <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
+                현재 가격 수준 (기준선)
               </p>
             </div>
           </div>
@@ -79,27 +87,7 @@ export default async function WeeklyShiftPage() {
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col gap-12">
-            {shifts.map(shift => (
-              <section key={shift.id}>
-                <div className="flex items-center gap-3 mb-5 pb-4 border-b border-zinc-100">
-                  <div
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ background: '#7c3aed' }}
-                  />
-                  <h2 className="text-lg font-bold text-zinc-900">
-                    DTW 기준일: {shift.label}
-                  </h2>
-                  <span className="text-xs font-mono text-zinc-400">
-                    {new Date(shift.uploadedAt).toLocaleDateString('ko-KR')}
-                  </span>
-                </div>
-                <div className="rounded-xl border border-zinc-200 p-5 bg-white">
-                  <WeeklyShiftGallery assets={shift.assets} label={shift.label} />
-                </div>
-              </section>
-            ))}
-          </div>
+          <WeeklyShiftViewer shifts={shifts} />
         )}
       </main>
     </div>

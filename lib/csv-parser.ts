@@ -6,6 +6,41 @@ export const ASSET_NAMES = [
   'S&P500', 'NASDAQ', 'KOSPI', 'GOLD', 'DXY', 'USDKRW', 'USDJPY', '10YUSB', 'WTI'
 ]
 
+export const DTW_ASSET_NAMES = [
+  'SP500', 'NASDAQ', 'KOSPI', 'GOLD', 'DX', 'USDKRW', 'USDEUR', 'USDJPY', '10YUSB', 'WTI'
+]
+
+export interface DtwDataPoint {
+  date: string
+  ensembleMaster: number
+  ensembleRank1: number
+  currentLevel: number
+}
+
+export function parseDtwCsvText(text: string): DtwDataPoint[] {
+  const lines = text.split('\n').filter(l => l.trim())
+  if (lines.length < 2) return []
+
+  const header = lines[0].split(',').map(s => s.trim())
+  const masterIdx = header.findIndex(h => h.endsWith('_Ensemble_Master'))
+  const rank1Idx = header.findIndex(h => h.endsWith('_Ensemble_Rank_1'))
+  const levelIdx = header.findIndex(h => h.endsWith('_Current_Level'))
+  if (masterIdx < 0) return []
+
+  const result: DtwDataPoint[] = []
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(s => s.trim())
+    if (!cols[0]) continue
+    result.push({
+      date: cols[0],
+      ensembleMaster: parseFloat(cols[masterIdx]) || 0,
+      ensembleRank1: rank1Idx >= 0 ? (parseFloat(cols[rank1Idx]) || 0) : 0,
+      currentLevel: levelIdx >= 0 ? (parseFloat(cols[levelIdx]) || 0) : 0,
+    })
+  }
+  return result
+}
+
 function parsePercent(val: string): number {
   return parseFloat(val.replace('%', '').trim()) || 0
 }

@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import type { ProbIndexPoint } from './prob-index-parser'
+import type { DtwDataPoint } from './csv-parser'
 
 export interface AssetComment {
   [asset: string]: string
@@ -22,8 +23,8 @@ export interface ProbUpload {
 
 export interface AssetShift {
   name: string
-  imagePath: string
   description: string
+  data: DtwDataPoint[]
 }
 
 export interface WeeklyShift {
@@ -63,7 +64,10 @@ export async function addCsvUpload(upload: CsvUpload): Promise<void> {
 }
 
 export async function addWeeklyShift(shift: WeeklyShift): Promise<void> {
-  const { error } = await supabase.from('pred_invest_weekly_shifts').upsert({
+  // label을 키로 사용: 동일 label이 있으면 덮어씀
+  await supabase.from('pred_invest_weekly_shifts').delete().eq('label', shift.label)
+
+  const { error } = await supabase.from('pred_invest_weekly_shifts').insert({
     id: shift.id,
     uploaded_at: shift.uploadedAt,
     label: shift.label,

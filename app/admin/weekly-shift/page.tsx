@@ -2,20 +2,23 @@
 
 import { useRef, useState } from 'react'
 import { uploadWeeklyShiftAction } from '@/app/actions/weekly-shift'
-import { ASSET_NAMES } from '@/lib/csv-parser'
+import { DTW_ASSET_NAMES } from '@/lib/csv-parser'
 
-function AssetImageSlot({ asset }: { asset: string }) {
+function AssetCsvSlot({ asset }: { asset: string }) {
   return (
     <div className="rounded-lg border border-zinc-200 p-4 flex gap-4 items-start bg-white">
-      <div className="w-44 shrink-0">
+      <div className="w-52 shrink-0">
         <p className="text-xs font-semibold mb-2 text-violet-600">{asset}</p>
         <input
-          name={`image_${asset}`}
+          name={`csv_${asset}`}
           type="file"
-          accept="image/*"
+          accept=".csv,text/csv"
           className="w-full rounded-lg border border-zinc-200 bg-zinc-50 p-1.5 text-xs text-zinc-700 cursor-pointer
             file:mr-2 file:rounded file:border-0 file:bg-violet-100 file:px-2.5 file:py-1 file:text-xs file:font-medium file:text-violet-700 file:cursor-pointer hover:file:bg-violet-200"
         />
+        <p className="text-[10px] text-zinc-400 mt-1">
+          예: {asset}_DTW_Projection_12W.csv
+        </p>
       </div>
       <div className="flex-1">
         <p className="text-xs font-medium mb-1.5 text-zinc-500">변곡점 설명</p>
@@ -44,7 +47,10 @@ export default function WeeklyShiftPage() {
       const formData = new FormData(formRef.current)
       const result = await uploadWeeklyShiftAction(formData)
       if (result.error) setMessage({ type: 'error', text: result.error })
-      else setMessage({ type: 'success', text: '주간 궤적이 성공적으로 업로드되었습니다.' })
+      else {
+        setMessage({ type: 'success', text: '주간 DTW 궤적이 성공적으로 업로드되었습니다.' })
+        formRef.current.reset()
+      }
     } catch (err) {
       setMessage({ type: 'error', text: `업로드 실패: ${err instanceof Error ? err.message : String(err)}` })
     } finally {
@@ -58,7 +64,8 @@ export default function WeeklyShiftPage() {
     <div className="p-8 max-w-4xl">
       <h1 className="text-xl font-bold text-zinc-900 mb-1">주간 DTW 궤적 업로드</h1>
       <p className="text-xs mb-6 text-zinc-500">
-        9개 자산군의 DTW 롤링 시프트 차트 이미지와 변곡점 설명을 업로드합니다.
+        10개 자산군의 DTW Projection CSV 파일을 업로드합니다.
+        컬럼 형식: Date, {'{ASSET}'}_Ensemble_Master, {'{ASSET}'}_Ensemble_Rank_1, {'{ASSET}'}_Current_Level
       </p>
 
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -76,10 +83,11 @@ export default function WeeklyShiftPage() {
         </div>
 
         <div className="rounded-xl border border-zinc-200 p-5 bg-white">
-          <h2 className="text-sm font-semibold text-zinc-900 mb-4">자산별 이미지 & 설명</h2>
+          <h2 className="text-sm font-semibold text-zinc-900 mb-1">자산별 CSV & 설명</h2>
+          <p className="text-xs text-zinc-400 mb-4">CSV 파일을 업로드하지 않은 자산은 해당 회차에서 빈 차트로 표시됩니다.</p>
           <div className="grid grid-cols-1 gap-4">
-            {ASSET_NAMES.map(asset => (
-              <AssetImageSlot key={asset} asset={asset} />
+            {DTW_ASSET_NAMES.map(asset => (
+              <AssetCsvSlot key={asset} asset={asset} />
             ))}
           </div>
         </div>

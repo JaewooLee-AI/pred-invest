@@ -1,51 +1,34 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+import { DtwChart } from '@/components/charts/DtwChart'
 import type { AssetShift } from '@/lib/db'
 
 interface WeeklyShiftGalleryProps {
   assets: AssetShift[]
-  label: string
 }
 
-export function WeeklyShiftGallery({ assets, label }: WeeklyShiftGalleryProps) {
+export function WeeklyShiftGallery({ assets }: WeeklyShiftGalleryProps) {
   const [selected, setSelected] = useState<AssetShift | null>(null)
-  const hasImages = assets.some(a => a.imagePath)
 
-  if (!hasImages) {
-    return (
-      <div className="text-center py-16 text-zinc-400">
-        <p className="text-sm">업로드된 궤적 이미지가 없습니다.</p>
-      </div>
-    )
-  }
+  const activeAssets = assets.filter(a => a.data?.length > 0)
+
+  if (activeAssets.length === 0) return null
 
   return (
     <>
-      <p className="text-xs mb-4 font-mono text-zinc-400">
-        DTW 기준일: {label}
-      </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {assets.filter(a => a.imagePath).map(asset => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {activeAssets.map(asset => (
           <button
             key={asset.name}
             onClick={() => setSelected(asset)}
-            className="group relative rounded-xl overflow-hidden border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all"
-            style={{ aspectRatio: '4/3', background: '#fafafa' }}
+            className="group rounded-xl border border-zinc-200 hover:border-violet-300 hover:shadow-md transition-all bg-white p-4 text-left"
           >
-            <Image
-              src={asset.imagePath}
-              alt={asset.name}
-              fill
-              className="object-cover transition-transform duration-200 group-hover:scale-[1.02]"
-            />
-            <div
-              className="absolute inset-x-0 bottom-0 p-2.5"
-              style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)' }}
-            >
-              <p className="text-xs font-semibold text-white">{asset.name}</p>
-            </div>
+            <p className="text-xs font-semibold text-violet-600 mb-3">{asset.name}</p>
+            <DtwChart data={asset.data} assetName={asset.name} />
+            {asset.description && (
+              <p className="text-[10px] text-zinc-400 mt-2 line-clamp-2">{asset.description}</p>
+            )}
           </button>
         ))}
       </div>
@@ -57,7 +40,7 @@ export function WeeklyShiftGallery({ assets, label }: WeeklyShiftGalleryProps) {
           onClick={() => setSelected(null)}
         >
           <div
-            className="relative max-w-2xl w-full bg-white rounded-t-2xl sm:rounded-2xl overflow-hidden border border-zinc-200 shadow-2xl"
+            className="relative max-w-3xl w-full bg-white rounded-t-2xl sm:rounded-2xl overflow-hidden border border-zinc-200 shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-100">
@@ -71,13 +54,8 @@ export function WeeklyShiftGallery({ assets, label }: WeeklyShiftGalleryProps) {
                 ×
               </button>
             </div>
-            <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-              <Image
-                src={selected.imagePath}
-                alt={selected.name}
-                fill
-                className="object-contain"
-              />
+            <div className="p-6">
+              <DtwChart data={selected.data} assetName={selected.name} />
             </div>
             {selected.description && (
               <div className="px-5 py-4 border-t border-zinc-100 bg-zinc-50">
