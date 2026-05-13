@@ -29,7 +29,7 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
       {/* Stat cards with date selectors — 아래 섹션 순서와 동일: Prob/Index → Classification → DTW */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
         <DateStatCard
-          label="주간궤적 기준일"
+          label="Prob/Index 기준일"
           selected={probData?.referenceDate ?? '—'}
           dates={probUploads.map(u => u.referenceDate)}
           onSelect={setProbKey}
