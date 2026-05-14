@@ -18,13 +18,20 @@ const CustomTooltip = ({ active, payload, label }: {
 }) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border p-3 text-xs shadow-md bg-white" style={{ borderColor: '#e4e4e7' }}>
-      <p className="font-semibold mb-2 text-zinc-500">{label}</p>
+    <div
+      className="rounded-xl p-3 text-xs shadow-xl"
+      style={{
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
+        boxShadow: '0 8px 24px rgba(79,70,229,0.10)',
+      }}
+    >
+      <p className="font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>{label}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
-          <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.color }} />
-          <span className="text-zinc-500">{p.name}</span>
-          <span className="font-mono font-semibold" style={{ color: p.color }}>
+          <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ background: p.color }} />
+          <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
+          <span className="font-mono font-semibold ml-auto" style={{ color: p.color }}>
             {p.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </span>
         </div>
@@ -33,10 +40,10 @@ const CustomTooltip = ({ active, payload, label }: {
   )
 }
 
-export function DtwChart({ data, assetName }: DtwChartProps) {
+export function DtwChart({ data }: DtwChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[200px] text-xs text-zinc-400">
+      <div className="flex items-center justify-center h-[200px] text-xs" style={{ color: 'var(--text-muted)' }}>
         데이터 없음
       </div>
     )
@@ -57,18 +64,18 @@ export function DtwChart({ data, assetName }: DtwChartProps) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
         <XAxis
           dataKey="date"
-          tick={{ fontSize: 9, fill: '#9ca3af' }}
+          tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
           tickLine={false}
-          axisLine={{ stroke: '#e5e7eb' }}
+          axisLine={{ stroke: 'rgba(0,0,0,0.08)' }}
           interval="preserveStartEnd"
           tickFormatter={formatDate}
         />
         <YAxis
           domain={yDomain}
-          tick={{ fontSize: 9, fill: '#9ca3af' }}
+          tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
           tickLine={false}
           axisLine={false}
           width={55}
@@ -76,7 +83,7 @@ export function DtwChart({ data, assetName }: DtwChartProps) {
         />
         <Tooltip content={<CustomTooltip />} />
         <Legend
-          wrapperStyle={{ fontSize: '10px', color: '#9ca3af' }}
+          wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }}
           iconType="circle"
           iconSize={6}
         />
@@ -84,7 +91,7 @@ export function DtwChart({ data, assetName }: DtwChartProps) {
           type="monotone"
           dataKey="ensembleMaster"
           name="Ensemble Master"
-          stroke="#7c3aed"
+          stroke="#a78bfa"
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 3 }}
@@ -93,7 +100,7 @@ export function DtwChart({ data, assetName }: DtwChartProps) {
           type="monotone"
           dataKey="ensembleRank1"
           name="Rank 1"
-          stroke="#eab308"
+          stroke="#fbbf24"
           strokeWidth={1.5}
           strokeDasharray="5 3"
           dot={false}
@@ -103,7 +110,7 @@ export function DtwChart({ data, assetName }: DtwChartProps) {
           type="monotone"
           dataKey="currentLevel"
           name="Current Level"
-          stroke="#18181b"
+          stroke="#94a3b8"
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 3 }}

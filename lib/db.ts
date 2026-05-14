@@ -224,6 +224,33 @@ export async function getLatestProbUpload(): Promise<ProbUpload | null> {
   }
 }
 
+export interface RegisteredUser {
+  id: string
+  email: string
+  firstLoginAt: string
+  approved: boolean
+  approvedAt: string | null
+  approvedBy: string | null
+  createdAt: string
+}
+
+export async function getAllRegisteredUsers(): Promise<RegisteredUser[]> {
+  const { data } = await supabase
+    .from('pred_invest_users')
+    .select('*')
+    .order('created_at', { ascending: true })
+  if (!data) return []
+  return data.map(r => ({
+    id: r.id,
+    email: r.email,
+    firstLoginAt: r.first_login_at,
+    approved: r.approved,
+    approvedAt: r.approved_at ?? null,
+    approvedBy: r.approved_by ?? null,
+    createdAt: r.created_at,
+  }))
+}
+
 export async function getAllNotices(): Promise<Notice[]> {
   const { data } = await supabase
     .from('pred_invest_notices')

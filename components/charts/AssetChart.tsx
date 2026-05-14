@@ -15,12 +15,13 @@ interface DataPoint {
 interface AssetChartProps {
   asset: string
   data: DataPoint[]
+  height?: number
 }
 
 const LINE_COLORS = {
-  A: '#2563eb',
-  B: '#7c3aed',
-  C: '#16a34a',
+  A: '#60a5fa',
+  B: '#a78bfa',
+  C: '#34d399',
 }
 
 const CustomTooltip = ({ active, payload, label }: {
@@ -31,15 +32,19 @@ const CustomTooltip = ({ active, payload, label }: {
   if (!active || !payload?.length) return null
   return (
     <div
-      className="rounded-lg border p-3 text-xs shadow-md"
-      style={{ background: '#fff', borderColor: '#e4e4e7' }}
+      className="rounded-xl p-3 text-xs shadow-xl"
+      style={{
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
+        boxShadow: '0 8px 24px rgba(79,70,229,0.10)',
+      }}
     >
-      <p className="font-semibold mb-2 text-zinc-500">{label}</p>
+      <p className="font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>{label}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
-          <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.color }} />
-          <span className="text-zinc-500">{p.name}</span>
-          <span className="font-mono font-semibold" style={{ color: p.color }}>
+          <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ background: p.color }} />
+          <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
+          <span className="font-mono font-semibold ml-auto" style={{ color: p.color }}>
             {p.value.toFixed(1)}%
           </span>
         </div>
@@ -48,29 +53,29 @@ const CustomTooltip = ({ active, payload, label }: {
   )
 }
 
-export function AssetChart({ data }: AssetChartProps) {
+export function AssetChart({ data, height = 180 }: AssetChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={180}>
+    <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
         <XAxis
           dataKey="date"
-          tick={{ fontSize: 9, fill: '#9ca3af' }}
+          tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
           tickLine={false}
-          axisLine={{ stroke: '#e5e7eb' }}
+          axisLine={{ stroke: 'rgba(0,0,0,0.08)' }}
           interval="preserveStartEnd"
         />
         <YAxis
           domain={[0, 100]}
-          tick={{ fontSize: 9, fill: '#9ca3af' }}
+          tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
           tickLine={false}
           axisLine={false}
           tickFormatter={v => `${v}%`}
         />
-        <ReferenceLine y={50} stroke="#e5e7eb" strokeDasharray="4 4" />
+        <ReferenceLine y={50} stroke="rgba(0,0,0,0.10)" strokeDasharray="4 4" />
         <Tooltip content={<CustomTooltip />} />
         <Legend
-          wrapperStyle={{ fontSize: '10px', color: '#9ca3af' }}
+          wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }}
           iconType="circle"
           iconSize={6}
         />

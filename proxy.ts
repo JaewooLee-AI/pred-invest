@@ -37,6 +37,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
+  // 관리자 이메일만 /admin 접근 허용
+  const ADMIN_EMAIL = 'jaewoolee.ai@gmail.com'
+  if (user.email !== ADMIN_EMAIL) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
   return response
 }
 

@@ -10,7 +10,6 @@ interface WeeklyShiftViewerProps {
 
 export function WeeklyShiftViewer({ shifts }: WeeklyShiftViewerProps) {
   const [selectedLabel, setSelectedLabel] = useState(shifts[0]?.label ?? '')
-
   const current = shifts.find(s => s.label === selectedLabel) ?? shifts[0]
 
   return (
@@ -25,13 +24,13 @@ export function WeeklyShiftViewer({ shifts }: WeeklyShiftViewerProps) {
               onClick={() => setSelectedLabel(s.label)}
               className="px-3.5 py-1.5 rounded-full text-xs font-medium transition-all"
               style={isActive ? {
-                background: '#7c3aed',
+                background: 'linear-gradient(135deg, #6366f1, #a78bfa)',
                 color: '#fff',
-                boxShadow: '0 1px 4px 0 rgba(124,58,237,0.25)',
+                boxShadow: '0 0 16px rgba(99,102,241,0.25)',
               } : {
-                background: '#f4f4f5',
-                color: '#71717a',
-                border: '1px solid #e4e4e7',
+                background: 'var(--bg-elevated)',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border)',
               }}
             >
               {s.label}
@@ -40,7 +39,6 @@ export function WeeklyShiftViewer({ shifts }: WeeklyShiftViewerProps) {
         })}
       </div>
 
-      {/* 선택된 기준일 차트 */}
       {current && <WeeklyShiftGallery assets={current.assets} />}
     </div>
   )

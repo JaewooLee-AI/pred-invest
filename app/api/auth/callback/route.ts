@@ -1,28 +1,27 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
-const ALLOWED_EMAILS = ['jaewoolee.ai@gmail.com']
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const from = searchParams.get('from') ?? '/admin'
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=no_code`)
   }
 
-  const cookieStore = await cookies()
+  const successResponse = NextResponse.redirect(`${origin}/dashboard`)
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return cookieStore.getAll() },
+        getAll() { return request.cookies.getAll() },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
+            successResponse.cookies.set(name, value, options)
           )
         },
       },
@@ -30,15 +29,34 @@ export async function GET(request: NextRequest) {
   )
 
   const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-
   if (error || !data.user) {
     return NextResponse.redirect(`${origin}/login?error=auth_failed`)
   }
 
-  if (!ALLOWED_EMAILS.includes(data.user.email ?? '')) {
-    await supabase.auth.signOut()
-    return NextResponse.redirect(`${origin}/login?error=unauthorized`)
+  const email = data.user.email ?? ''
+
+  // 최초 로그인이면 레코드 생성 (이미 있으면 무시)
+  await supabase.from('pred_invest_users').insert({ email })
+
+  // 사용자 레코드 조회
+  const { data: user } = await supabase
+    .from('pred_invest_users')
+    .select('approved, first_login_at')
+    .eq('email', email)
+    .maybeSingle()
+
+  if (!user) {
+    return NextResponse.redirect(`${origin}/login?error=auth_failed`)
   }
 
-  return NextResponse.redirect(`${origin}${from}`)
+  const withinTrial = Date.now() - new Date(user.first_login_at).getTime() < SEVEN_DAYS_MS
+  const hasAccess = user.approved || withinTrial
+
+  if (!hasAccess) {
+    const denied = NextResponse.redirect(`${origin}/login?error=approval_required`)
+    successResponse.cookies.getAll().forEach(({ name }) => denied.cookies.delete(name))
+    return denied
+  }
+
+  return successResponse
 }

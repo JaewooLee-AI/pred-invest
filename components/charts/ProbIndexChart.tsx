@@ -13,10 +13,11 @@ interface DataPoint {
 
 interface ProbIndexChartProps {
   data: DataPoint[]
+  height?: number
 }
 
-const PROB_COLOR = '#f59e0b'
-const INDEX_COLOR = '#2563eb'
+const PROB_COLOR = '#fbbf24'
+const INDEX_COLOR = '#60a5fa'
 
 const CustomTooltip = ({ active, payload, label }: {
   active?: boolean
@@ -26,15 +27,19 @@ const CustomTooltip = ({ active, payload, label }: {
   if (!active || !payload?.length) return null
   return (
     <div
-      className="rounded-lg border p-3 text-xs shadow-md"
-      style={{ background: '#fff', borderColor: '#e4e4e7' }}
+      className="rounded-xl p-3 text-xs shadow-xl"
+      style={{
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
+        boxShadow: '0 8px 24px rgba(79,70,229,0.10)',
+      }}
     >
-      <p className="font-semibold mb-2 text-zinc-500">{label}</p>
+      <p className="font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>{label}</p>
       {payload.map(p => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-1">
-          <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.color }} />
-          <span className="text-zinc-500">{p.name}</span>
-          <span className="font-mono font-semibold" style={{ color: p.color }}>
+          <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ background: p.color }} />
+          <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
+          <span className="font-mono font-semibold ml-auto" style={{ color: p.color }}>
             {p.dataKey === 'prob' ? `${p.value.toFixed(1)}%` : p.value.toFixed(2)}
           </span>
         </div>
@@ -43,9 +48,9 @@ const CustomTooltip = ({ active, payload, label }: {
   )
 }
 
-export function ProbIndexChart({ data }: ProbIndexChartProps) {
+export function ProbIndexChart({ data, height = 180 }: ProbIndexChartProps) {
   if (!data.length) return (
-    <div className="h-44 flex items-center justify-center text-xs text-zinc-400">
+    <div className="h-44 flex items-center justify-center text-xs" style={{ color: 'var(--text-muted)' }}>
       데이터 없음
     </div>
   )
@@ -55,17 +60,16 @@ export function ProbIndexChart({ data }: ProbIndexChartProps) {
   const pad = Math.max((indexMax - indexMin) * 0.15, 1)
 
   return (
-    <ResponsiveContainer width="100%" height={180}>
+    <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 4, right: 28, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
         <XAxis
           dataKey="date"
-          tick={{ fontSize: 9, fill: '#9ca3af' }}
+          tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
           tickLine={false}
-          axisLine={{ stroke: '#e5e7eb' }}
+          axisLine={{ stroke: 'rgba(0,0,0,0.08)' }}
           interval="preserveStartEnd"
         />
-        {/* Left: Prob axis */}
         <YAxis
           yAxisId="prob"
           orientation="left"
@@ -76,7 +80,6 @@ export function ProbIndexChart({ data }: ProbIndexChartProps) {
           tickFormatter={v => `${v}%`}
           width={32}
         />
-        {/* Right: Index axis */}
         <YAxis
           yAxisId="index"
           orientation="right"
@@ -87,13 +90,12 @@ export function ProbIndexChart({ data }: ProbIndexChartProps) {
           tickFormatter={v => v.toFixed(1)}
           width={32}
         />
-        <ReferenceLine yAxisId="prob" y={50} stroke="#e5e7eb" strokeDasharray="4 4" />
+        <ReferenceLine yAxisId="prob" y={50} stroke="rgba(0,0,0,0.10)" strokeDasharray="4 4" />
         <Tooltip content={<CustomTooltip />} />
         <Legend
-          wrapperStyle={{ fontSize: '10px', color: '#9ca3af' }}
+          wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }}
           iconSize={6}
         />
-        {/* Prob: thin dashed */}
         <Line
           yAxisId="prob"
           type="monotone"
@@ -105,7 +107,6 @@ export function ProbIndexChart({ data }: ProbIndexChartProps) {
           dot={false}
           activeDot={{ r: 3 }}
         />
-        {/* Index: thick solid */}
         <Line
           yAxisId="index"
           type="monotone"
