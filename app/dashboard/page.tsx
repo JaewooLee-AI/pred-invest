@@ -39,15 +39,15 @@ export default async function DashboardPage() {
             </span>
           </div>
           <h1
-            className="text-3xl sm:text-[2.6rem] font-bold tracking-tight leading-[1.15]"
+            className="text-3xl sm:text-[2.6rem] font-extrabold tracking-tight leading-[1.15]"
             style={{
-              background: 'linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%)',
+              background: 'linear-gradient(120deg, #3b82f6 0%, #6366f1 40%, #ffffff 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
             }}
           >
-            크로스에셋 대시보드
+            CrossAsset Dashboard
           </h1>
           <p className="text-sm mt-3 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
             다중 자산군 상승 확률 &middot; DTW 궤적 &middot; 시장 분석 리포트

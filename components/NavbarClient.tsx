@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logoutAction } from '@/app/actions/auth'
-import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 const ADMIN_EMAIL = 'jaewoolee.ai@gmail.com'
 
@@ -50,10 +49,8 @@ const isAdmin = user?.email === ADMIN_EMAIL
 
     const reset = () => {
       clearTimeout(timer)
-      timer = setTimeout(async () => {
-        const supabase = createSupabaseBrowserClient()
-        await supabase.auth.signOut()
-        window.location.href = '/'
+      timer = setTimeout(() => {
+        logoutAction()
       }, INACTIVITY_MS)
     }
 

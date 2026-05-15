@@ -26,39 +26,6 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
 
   return (
     <>
-      {/* Date stat cards — only when authenticated */}
-      {isAuthenticated && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
-          <DateStatCard
-            label="Prob/Index 기준일"
-            selected={probData?.referenceDate ?? '—'}
-            dates={probUploads.map(u => u.referenceDate)}
-            onSelect={setProbKey}
-            accent="var(--amber)"
-            accentTint="var(--amber-tint)"
-            accentBorder="var(--amber-border)"
-          />
-          <DateStatCard
-            label="분류모델 기준일"
-            selected={csvData?.referenceDate ?? '—'}
-            dates={csvUploads.map(u => u.referenceDate)}
-            onSelect={setCsvKey}
-            accent="var(--blue)"
-            accentTint="var(--blue-tint)"
-            accentBorder="var(--blue-border)"
-          />
-          <DateStatCard
-            label="DTW 기준일"
-            selected={weeklyShift?.label ?? '—'}
-            dates={weeklyShifts.map(s => s.label)}
-            onSelect={setDtwKey}
-            accent="var(--purple)"
-            accentTint="var(--purple-tint)"
-            accentBorder="var(--purple-border)"
-          />
-        </div>
-      )}
-
       <Divider />
 
       {/* Prob & Index */}
@@ -72,6 +39,9 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
           accentBorder="var(--amber-border)"
           href="/about/classification"
           hrefLabel="모델 안내"
+          dates={isAuthenticated ? probUploads.map(u => u.referenceDate) : []}
+          selectedDate={probData?.referenceDate ?? ''}
+          onSelectDate={setProbKey}
         />
         {isAuthenticated ? (
           probData ? (
@@ -97,6 +67,9 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
           accentBorder="var(--blue-border)"
           href="/about/classification"
           hrefLabel="모델 안내"
+          dates={isAuthenticated ? csvUploads.map(u => u.referenceDate) : []}
+          selectedDate={csvData?.referenceDate ?? ''}
+          onSelectDate={setCsvKey}
         />
         {isAuthenticated ? (
           csvData ? (
@@ -124,6 +97,9 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
             accentBorder="var(--purple-border)"
             href="/about/dtw"
             hrefLabel="DTW 안내"
+            dates={isAuthenticated ? weeklyShifts.map(s => s.label) : []}
+            selectedDate={weeklyShift?.label ?? ''}
+            onSelectDate={setDtwKey}
           />
           {isAuthenticated ? (
             weeklyShift ? (
@@ -250,64 +226,14 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
 
 /* ─── Sub-components ─── */
 
-function DateStatCard({
-  label, selected, dates, onSelect, accent, accentTint, accentBorder,
-}: {
-  label: string
-  selected: string
-  dates: string[]
-  onSelect: (v: string) => void
-  accent: string
-  accentTint: string
-  accentBorder: string
-}) {
-  return (
-    <div
-      className="rounded-2xl p-5 transition-colors"
-      style={{
-        background: 'var(--card)',
-        border: '1px solid var(--border)',
-        borderTop: `2px solid ${accent}`,
-      }}
-    >
-      <p className="text-[10px] font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-        {label}
-      </p>
-      <p className="text-xl font-bold font-mono tracking-tight truncate" style={{ color: accent }}>
-        {selected}
-      </p>
-      {dates.length > 1 ? (
-        <select
-          value={selected}
-          onChange={e => onSelect(e.target.value)}
-          className="mt-3 w-full text-xs rounded-lg border px-2.5 py-1.5 outline-none cursor-pointer transition-colors"
-          style={{
-            borderColor: accentBorder,
-            background: accentTint,
-            color: accent,
-          }}
-        >
-          {dates.map(d => (
-            <option key={d} value={d} style={{ background: 'var(--card)', color: 'var(--text)' }}>
-              {d}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <p className="text-[10px] mt-2" style={{ color: 'var(--text-muted)' }}>
-          {dates.length === 0 ? '데이터 없음' : '최신 데이터'}
-        </p>
-      )}
-    </div>
-  )
-}
-
 function SectionHeader({
   title, sub, badge, accent, accentTint, accentBorder, href, hrefLabel,
+  dates, selectedDate, onSelectDate,
 }: {
   title: string; sub: string
   badge: string; accent: string; accentTint: string; accentBorder: string
   href?: string; hrefLabel?: string
+  dates?: string[]; selectedDate?: string; onSelectDate?: (v: string) => void
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -319,15 +245,53 @@ function SectionHeader({
       </span>
       <h2 className="text-base font-bold" style={{ color: 'var(--text)' }}>{title}</h2>
       <span className="text-xs hidden sm:inline" style={{ color: 'var(--text-muted)' }}>{sub}</span>
-      {href && (
-        <Link
-          href={href}
-          className="ml-auto text-xs transition-colors hover:opacity-80"
-          style={{ color: accent }}
-        >
-          {hrefLabel} →
-        </Link>
-      )}
+      <div className="ml-auto flex items-center gap-2">
+        {dates && dates.length > 0 && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-medium hidden sm:inline" style={{ color: 'var(--text-muted)' }}>
+              기준일
+            </span>
+            {dates.length === 1 ? (
+              <div className="flex items-center gap-1">
+                <span
+                  className="text-[10px] font-mono px-2 py-0.5 rounded-md"
+                  style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
+                >
+                  {selectedDate}
+                </span>
+                <span
+                  className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
+                  style={{ background: accentTint, color: accent, opacity: 0.75 }}
+                >
+                  최신
+                </span>
+              </div>
+            ) : (
+              <select
+                value={selectedDate}
+                onChange={e => onSelectDate?.(e.target.value)}
+                className="text-[10px] font-mono rounded-md border px-2 py-0.5 outline-none cursor-pointer"
+                style={{ borderColor: accentBorder, background: accentTint, color: accent }}
+              >
+                {dates.map((d, i) => (
+                  <option key={d} value={d} style={{ background: 'var(--card)', color: 'var(--text)' }}>
+                    {d}{i === 0 ? ' (최신)' : ''}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+        {href && (
+          <Link
+            href={href}
+            className="text-xs transition-colors hover:opacity-80"
+            style={{ color: accent }}
+          >
+            {hrefLabel} →
+          </Link>
+        )}
+      </div>
     </div>
   )
 }
