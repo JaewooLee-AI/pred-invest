@@ -37,8 +37,6 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
           accent="var(--amber)"
           accentTint="var(--amber-tint)"
           accentBorder="var(--amber-border)"
-          href="/about/classification"
-          hrefLabel="모델 안내"
           dates={isAuthenticated ? probUploads.map(u => u.referenceDate) : []}
           selectedDate={probData?.referenceDate ?? ''}
           onSelectDate={setProbKey}
@@ -65,8 +63,6 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
           accent="var(--blue)"
           accentTint="var(--blue-tint)"
           accentBorder="var(--blue-border)"
-          href="/about/classification"
-          hrefLabel="모델 안내"
           dates={isAuthenticated ? csvUploads.map(u => u.referenceDate) : []}
           selectedDate={csvData?.referenceDate ?? ''}
           onSelectDate={setCsvKey}
@@ -95,8 +91,6 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
             accent="var(--purple)"
             accentTint="var(--purple-tint)"
             accentBorder="var(--purple-border)"
-            href="/about/dtw"
-            hrefLabel="DTW 안내"
             dates={isAuthenticated ? weeklyShifts.map(s => s.label) : []}
             selectedDate={weeklyShift?.label ?? ''}
             onSelectDate={setDtwKey}
@@ -162,8 +156,6 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
             accent="var(--emerald)"
             accentTint="var(--emerald-tint)"
             accentBorder="var(--emerald-border)"
-            href="/notices"
-            hrefLabel="전체 보기"
           />
           {notices.length > 0 ? (
             <div className="flex flex-col gap-2">
@@ -227,70 +219,57 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
 /* ─── Sub-components ─── */
 
 function SectionHeader({
-  title, sub, badge, accent, accentTint, accentBorder, href, hrefLabel,
+  title, sub, badge, accent, accentTint, accentBorder,
   dates, selectedDate, onSelectDate,
 }: {
   title: string; sub: string
   badge: string; accent: string; accentTint: string; accentBorder: string
-  href?: string; hrefLabel?: string
   dates?: string[]; selectedDate?: string; onSelectDate?: (v: string) => void
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-6">
-      <span
-        className="text-[10px] font-semibold px-2.5 py-1 rounded-full tracking-wide"
-        style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
-      >
-        {badge}
-      </span>
-      <h2 className="text-base font-bold" style={{ color: 'var(--text)' }}>{title}</h2>
-      <span className="text-xs hidden sm:inline" style={{ color: 'var(--text-muted)' }}>{sub}</span>
-      <div className="ml-auto flex items-center gap-2">
-        {dates && dates.length > 0 && (
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-medium hidden sm:inline" style={{ color: 'var(--text-muted)' }}>
-              기준일
-            </span>
-            {dates.length === 1 ? (
-              <div className="flex items-center gap-1">
-                <span
-                  className="text-[10px] font-mono px-2 py-0.5 rounded-md"
-                  style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
-                >
-                  {selectedDate}
-                </span>
-                <span
-                  className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
-                  style={{ background: accentTint, color: accent, opacity: 0.75 }}
-                >
-                  최신
-                </span>
-              </div>
-            ) : (
-              <select
-                value={selectedDate}
-                onChange={e => onSelectDate?.(e.target.value)}
-                className="text-[10px] font-mono rounded-md border px-2 py-0.5 outline-none cursor-pointer"
-                style={{ borderColor: accentBorder, background: accentTint, color: accent }}
+    <div className="mb-6">
+      {/* Date row — above title */}
+      {dates && dates.length > 0 && (
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>기준일</span>
+          {dates.length === 1 ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold font-mono" style={{ color: accent }}>
+                {selectedDate}
+              </span>
+              <span
+                className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
+                style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
               >
-                {dates.map((d, i) => (
-                  <option key={d} value={d} style={{ background: 'var(--card)', color: 'var(--text)' }}>
-                    {d}{i === 0 ? ' (최신)' : ''}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-        )}
-        {href && (
-          <Link
-            href={href}
-            className="text-xs transition-colors hover:opacity-80"
-            style={{ color: accent }}
-          >
-            {hrefLabel} →
-          </Link>
-        )}
+                최신
+              </span>
+            </div>
+          ) : (
+            <select
+              value={selectedDate}
+              onChange={e => onSelectDate?.(e.target.value)}
+              className="text-sm font-bold font-mono rounded-md border px-2 py-0.5 outline-none cursor-pointer"
+              style={{ borderColor: accentBorder, background: accentTint, color: accent }}
+            >
+              {dates.map((d, i) => (
+                <option key={d} value={d} style={{ background: 'var(--card)', color: 'var(--text)' }}>
+                  {d}{i === 0 ? ' (최신)' : ''}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
+      {/* Title row */}
+      <div className="flex flex-wrap items-center gap-3">
+        <span
+          className="text-[10px] font-semibold px-2.5 py-1 rounded-full tracking-wide"
+          style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
+        >
+          {badge}
+        </span>
+        <h2 className="text-base font-bold" style={{ color: 'var(--text)' }}>{title}</h2>
+        <span className="text-xs hidden sm:inline" style={{ color: 'var(--text-muted)' }}>{sub}</span>
       </div>
     </div>
   )

@@ -10,6 +10,7 @@ const ADMIN_EMAIL = 'jaewoolee.ai@gmail.com'
 const navLinks = [
   { href: '/dashboard', label: '대시보드' },
   { href: '/weekly-shift', label: '주간 궤적' },
+  { href: '/about/classification', label: '모델소개' },
   { href: '/notices', label: '공지사항' },
 ]
 
