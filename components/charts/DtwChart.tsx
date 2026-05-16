@@ -17,40 +17,21 @@ interface DtwChartProps {
   assetName?: string
 }
 
-interface UnifiedPoint {
-  date: string
-  ensembleMaster?: number
-  ensembleRank1?: number
-  currentLevel?: number
-  prevMaster?: number
-  prevRank1?: number
-}
+// 현재 데이터에 없는 날짜만 이전 데이터에서 가져와 하나의 연속 배열로 합산
+function buildMergedData(datasets: DtwDataset[], prevCount: number): DtwDataPoint[] {
+  const current = datasets[0]?.data ?? []
+  const currentDates = new Set(current.map(d => d.date))
 
-function buildUnifiedData(current: DtwDataPoint[], prevDatasets: DtwDataset[]): UnifiedPoint[] {
-  // 이전 데이터 전체를 포함 (날짜 겹침 여부 무관) — 겹치는 구간에서 두 예측선 동시 표시
-  // 여러 이전 데이터셋은 최신 이전 우선으로 병합
-  const prevMap = new Map<string, { master: number; rank1: number }>()
-  for (const ds of [...prevDatasets].reverse()) {
+  const extra: DtwDataPoint[] = []
+  for (const ds of datasets.slice(1, prevCount + 1)) {
     for (const p of ds.data) {
-      prevMap.set(p.date, { master: p.ensembleMaster, rank1: p.ensembleRank1 })
+      if (!currentDates.has(p.date)) {
+        extra.push(p)
+      }
     }
   }
 
-  const currMap = new Map(current.map(d => [d.date, d]))
-  const allDates = Array.from(new Set([...prevMap.keys(), ...currMap.keys()])).sort()
-
-  return allDates.map(date => {
-    const c = currMap.get(date)
-    const p = prevMap.get(date)
-    return {
-      date,
-      ensembleMaster: c?.ensembleMaster,
-      ensembleRank1: c?.ensembleRank1,
-      currentLevel: c?.currentLevel,
-      prevMaster: p?.master,
-      prevRank1: p?.rank1,
-    }
-  })
+  return [...extra, ...current].sort((a, b) => a.date.localeCompare(b.date))
 }
 
 const CustomTooltip = ({ active, payload, label }: {
@@ -88,7 +69,7 @@ export function DtwChart({ datasets }: DtwChartProps) {
   const [prevCount, setPrevCount] = useState(0)
 
   const current = datasets[0]?.data ?? []
-  const availablePrev = datasets.slice(1)
+  const availablePrev = datasets.slice(1).filter(ds => ds.data.length > 0)
 
   if (current.length === 0) {
     return (
@@ -98,14 +79,10 @@ export function DtwChart({ datasets }: DtwChartProps) {
     )
   }
 
-  const prevDatasets = availablePrev.slice(0, prevCount)
-  const merged = buildUnifiedData(current, prevDatasets)
-  const hasPrev = prevCount > 0 && prevDatasets.some(ds => ds.data.length > 0)
+  const data = buildMergedData(datasets, prevCount)
 
-  const allValues = merged.flatMap(p => [
-    p.ensembleMaster, p.ensembleRank1, p.currentLevel, p.prevMaster, p.prevRank1,
-  ]).filter((v): v is number => v !== undefined && v !== 0)
-
+  const allValues = data.flatMap(d => [d.ensembleMaster, d.ensembleRank1, d.currentLevel])
+    .filter(v => v !== 0 && v !== undefined)
   const minVal = Math.min(...allValues)
   const maxVal = Math.max(...allValues)
   const padding = (maxVal - minVal) * 0.1 || Math.abs(maxVal) * 0.05
@@ -118,7 +95,6 @@ export function DtwChart({ datasets }: DtwChartProps) {
 
   return (
     <div>
-      {/* 이전 기간 포함 토글 */}
       {availablePrev.length > 0 && (
         <div className="flex items-center gap-1 mb-2">
           <span className="text-[9px] mr-1" style={{ color: 'var(--text-muted)' }}>이전 포함</span>
@@ -128,9 +104,9 @@ export function DtwChart({ datasets }: DtwChartProps) {
               onClick={() => setPrevCount(n)}
               className="text-[9px] px-1.5 py-0.5 rounded transition-all"
               style={prevCount === n ? {
-                background: n === 0 ? 'rgba(99,102,241,0.15)' : 'rgba(239,68,68,0.15)',
-                color: n === 0 ? 'var(--purple)' : '#ef4444',
-                border: `1px solid ${n === 0 ? 'var(--purple-border)' : 'rgba(239,68,68,0.3)'}`,
+                background: 'rgba(99,102,241,0.15)',
+                color: 'var(--purple)',
+                border: '1px solid var(--purple-border)',
               } : {
                 background: 'transparent',
                 color: 'var(--text-muted)',
@@ -144,7 +120,7 @@ export function DtwChart({ datasets }: DtwChartProps) {
       )}
 
       <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={merged} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+        <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
           <XAxis
             dataKey="date"
@@ -164,30 +140,15 @@ export function DtwChart({ datasets }: DtwChartProps) {
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }} iconType="circle" iconSize={6} />
-
-          {/* 이전 기간 — 적색 (현재에 없는 날짜만) */}
-          {hasPrev && (
-            <Line type="monotone" dataKey="prevMaster"
-              name="Prev Master" stroke="#ef4444" strokeWidth={1.5}
-              dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />
-          )}
-          {hasPrev && (
-            <Line type="monotone" dataKey="prevRank1"
-              name="Prev Rank 1" stroke="#ef4444" strokeWidth={1}
-              strokeDasharray="5 3"
-              dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />
-          )}
-
-          {/* 현재 기간 — 기본 색상 */}
           <Line type="monotone" dataKey="ensembleMaster"
             name="Ensemble Master" stroke="#a78bfa" strokeWidth={2}
-            dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />
+            dot={false} activeDot={{ r: 3 }} />
           <Line type="monotone" dataKey="ensembleRank1"
             name="Rank 1" stroke="#fbbf24" strokeWidth={1.5} strokeDasharray="5 3"
-            dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />
+            dot={false} activeDot={{ r: 3 }} />
           <Line type="monotone" dataKey="currentLevel"
             name="Current Level" stroke="#94a3b8" strokeWidth={2}
-            dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />
+            dot={false} activeDot={{ r: 3 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>
