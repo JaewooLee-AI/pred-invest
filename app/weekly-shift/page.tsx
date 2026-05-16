@@ -51,10 +51,10 @@ export default async function WeeklyShiftPage() {
         >
           <div className="flex items-start gap-3">
             <div className="flex items-center gap-1.5 mt-1 shrink-0">
-              <div className="w-7 h-[2.5px] rounded-full" style={{ background: '#a78bfa' }} />
+              <div className="w-7 h-[2.5px] rounded-full" style={{ background: '#0071e3' }} />
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>보라색 실선 — Ensemble Master</p>
+              <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>파란색 실선 — Ensemble Master</p>
               <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 과거 유사 국면의 앙상블 평균 미래 궤적 — 기본 시나리오
               </p>

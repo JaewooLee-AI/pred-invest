@@ -161,7 +161,8 @@ export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProp
           {closingPrices && Object.keys(closingPrices).length > 0 && (
             <Line type="monotone" dataKey="actualClose"
               name="실제 종가" stroke="#34c759" strokeWidth={2} strokeDasharray="3 3"
-              dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#34c759' }} connectNulls={false} />
+              dot={{ r: 3, fill: '#34c759', strokeWidth: 0 }}
+              activeDot={{ r: 4, strokeWidth: 0, fill: '#34c759' }} connectNulls={false} />
           )}
         </LineChart>
       </ResponsiveContainer>
