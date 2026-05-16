@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { logoutAction } from '@/app/actions/auth'
 
@@ -82,16 +83,16 @@ const isAdmin = user?.email === ADMIN_EMAIL
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 h-14">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
-            style={{ background: 'linear-gradient(135deg, #6366f1 0%, #a78bfa 100%)' }}
-          >
-            ◈
-          </div>
-          <span className="text-sm font-bold tracking-tight" style={{ color: 'var(--text)' }}>
-            CrossAsset
-          </span>
+        <Link href="/" className="flex items-center shrink-0" onClick={() => setOpen(false)}>
+          <Image
+            src="/logo.png"
+            alt="CrossAsset"
+            width={140}
+            height={76}
+            className="object-contain"
+            style={{ height: '32px', width: 'auto' }}
+            priority
+          />
         </Link>
 
         {/* Desktop nav */}

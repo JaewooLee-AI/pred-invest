@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { logoutAction } from '@/app/actions/auth'
 
 const adminNav = [
@@ -23,20 +24,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         {/* Logo */}
         <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
-          <Link href="/" className="flex items-center gap-2">
-            <div
-              className="w-6 h-6 rounded-md flex items-center justify-center text-white text-xs font-bold shrink-0"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #a78bfa)' }}
-            >
-              ◈
-            </div>
-            <span className="text-sm font-bold tracking-tight" style={{ color: 'var(--text)' }}>
-              CrossAsset
-            </span>
+          <Link href="/" className="flex flex-col gap-1">
+            <Image
+              src="/logo.png"
+              alt="CrossAsset"
+              width={140}
+              height={76}
+              className="object-contain"
+              style={{ height: '28px', width: 'auto' }}
+              priority
+            />
+            <p className="text-[10px] font-mono px-0.5" style={{ color: 'var(--text-muted)' }}>
+              Admin Console
+            </p>
           </Link>
-          <p className="text-[10px] mt-1 font-mono px-0.5" style={{ color: 'var(--text-muted)' }}>
-            Admin Console
-          </p>
         </div>
 
         {/* Nav */}

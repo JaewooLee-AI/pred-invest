@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { LandingLoginButton } from '@/components/LandingLoginButton'
 import { LandingFeatureCards } from '@/components/LandingFeatureCards'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,15 +40,16 @@ export default async function LandingPage() {
           boxShadow: '0 1px 0 rgba(79,70,229,0.06)',
         }}
       >
-        <Link href="/" className="flex items-center gap-2.5">
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
-            style={{ background: 'linear-gradient(135deg, #6366f1 0%, #a78bfa 100%)' }}
-          >
-            ◈
-          </div>
-          <span className="text-sm font-bold tracking-tight" style={{ color: 'var(--text)' }}>CrossAsset</span>
-          <span className="hidden sm:inline text-[10px] font-mono ml-0.5" style={{ color: 'var(--text-muted)' }}>Analytics</span>
+        <Link href="/" className="flex items-center shrink-0">
+          <Image
+            src="/logo.png"
+            alt="CrossAsset"
+            width={140}
+            height={76}
+            className="object-contain"
+            style={{ height: '32px', width: 'auto' }}
+            priority
+          />
         </Link>
         <LandingLoginButton variant="nav" />
       </nav>
@@ -235,12 +237,15 @@ export default async function LandingPage() {
         className="py-8 px-6 flex flex-col sm:flex-row items-center justify-between gap-3"
         style={{ borderTop: '1px solid var(--border)' }}
       >
-        <div className="flex items-center gap-2">
-          <div
-            className="w-5 h-5 rounded-md flex items-center justify-center text-white text-[10px] font-bold"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #a78bfa)' }}
-          >◈</div>
-          <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>CrossAsset Analytics</span>
+        <div className="flex items-center">
+          <Image
+            src="/logo.png"
+            alt="CrossAsset"
+            width={140}
+            height={76}
+            className="object-contain"
+            style={{ height: '24px', width: 'auto', opacity: 0.7 }}
+          />
         </div>
         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
           © 2025 &nbsp;·&nbsp; 승인된 계정 전용 서비스
