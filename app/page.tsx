@@ -47,7 +47,7 @@ export default async function LandingPage() {
               alt="CrossAsset"
               width={2400}
               height={1309}
-              style={{ height: '150px', width: 'auto', marginTop: '-49px', marginBottom: '-49px' }}
+              style={{ height: '150px', width: 'auto', marginTop: '-49px', marginBottom: '-49px', transform: 'scale(0.7)', transformOrigin: 'left center' }}
               priority
             />
           </div>
@@ -56,57 +56,26 @@ export default async function LandingPage() {
       </nav>
 
       {/* ── HERO ────────────────────────────── */}
-      <section className="relative flex flex-col items-center justify-center min-h-screen px-4 text-center pt-14">
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div style={{
-            position: 'absolute', top: '-8%', left: '50%', transform: 'translateX(-50%)',
-            width: '1000px', height: '700px',
-            background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.10) 0%, rgba(99,102,241,0.03) 50%, transparent 70%)',
-          }} />
-        </div>
-
-        <div className="relative z-10 max-w-3xl mx-auto">
-          {/* Badge */}
-          <div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8"
-            style={{
-              background: 'rgba(99,102,241,0.10)',
-              border: '1px solid rgba(99,102,241,0.28)',
-              color: 'var(--indigo-soft)',
-            }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full inline-block glow-dot" style={{ background: '#818cf8' }} />
-            <span className="text-[11px] font-mono tracking-[0.15em] uppercase">CrossAsset Analytics Platform</span>
-          </div>
-
+      <section className="relative flex flex-col items-center justify-center min-h-[80vh] px-4 text-center pt-20 pb-16 bg-[#f5f5f7]">
+        <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
           {/* Title */}
-          <h1
-            className="text-[2.8rem] sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
-            style={{
-              background: 'linear-gradient(160deg, #0f0e17 0%, #0f0e17 40%, #4f46e5 75%, #7c3aed 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            크로스에셋 시장의<br />변곡점을 선점하다
+          <h1 className="text-[48px] sm:text-[64px] lg:text-[72px] font-extrabold tracking-tight leading-[1.05] mb-6 text-[#1d1d1f]">
+            크로스에셋 시장의<br />변곡점을 선점하다.
           </h1>
 
           {/* Subtitle */}
-          <p
-            className="text-base sm:text-lg leading-[1.8] mb-10 max-w-xl mx-auto"
-            style={{ color: 'var(--text-secondary)' }}
-          >
+          <p className="text-[20px] sm:text-[24px] leading-[1.4] mb-10 max-w-3xl mx-auto font-normal text-[#86868b]">
             9개 주요 자산군의 상승 확률과 DTW 시계열 변곡점 궤적을<br className="hidden sm:block" />
             전문가 수준의 앙상블 모델로 분석합니다.
           </p>
 
           {/* CTA */}
-          <LandingLoginButton variant="hero" />
-          <p className="text-xs mt-4" style={{ color: 'var(--text-muted)' }}>
-            승인된 Google 계정만 접근 가능합니다
-          </p>
+          <div className="flex flex-col items-center gap-4">
+            <LandingLoginButton variant="hero" />
+            <p className="text-[13px] font-normal text-[#86868b] mt-2">
+              승인된 계정 전용 플랫폼
+            </p>
+          </div>
         </div>
       </section>
 
@@ -142,7 +111,12 @@ export default async function LandingPage() {
             <div
               key={label}
               className="rounded-2xl p-5 sm:p-6 text-center"
-              style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+              style={{
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+              }}
             >
               <div
                 className="text-3xl sm:text-4xl font-bold mb-1.5 tabular-nums"
@@ -162,17 +136,17 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ── FEATURES ───────────────────────── */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="text-center mb-12">
-          <p className="text-[11px] font-mono tracking-[0.18em] uppercase mb-3"
-            style={{ color: 'var(--indigo-soft)' }}>Core Modules</p>
-          <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: 'var(--text)' }}>
-            세 가지 핵심 분석 모듈
+      {/* ── BENTO FEATURES ───────────────────────── */}
+      <section className="max-w-7xl mx-auto px-6 pb-32">
+        <div className="text-center mb-16">
+          <p className="text-[12px] font-mono font-bold tracking-[0.2em] uppercase mb-4"
+            style={{ color: 'var(--indigo)' }}>Core Capabilities</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-5" style={{ color: 'var(--text)' }}>
+            직관적이고 압도적인 분석 도구
           </h2>
-          <p className="text-sm max-w-md mx-auto leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-            Bloomberg 터미널에서 영감을 받은 클린 인터페이스로<br />
-            복잡한 금융 데이터를 직관적으로 제공합니다.
+          <p className="text-base max-w-xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            Bloomberg 터미널의 깊이와 Apple의 우아함을 결합했습니다.<br />
+            복잡한 금융 데이터를 가장 아름답게 시각화합니다.
           </p>
         </div>
 
@@ -181,7 +155,7 @@ export default async function LandingPage() {
         {/* Asset chips */}
         <div
           className="mt-8 rounded-2xl p-5"
-          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+          style={{ background: 'var(--card)', border: '1px solid var(--border)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
         >
           <p className="text-[10px] font-mono tracking-widest uppercase mb-4 text-center"
             style={{ color: 'var(--text-muted)' }}>Covered Assets</p>
@@ -209,15 +183,15 @@ export default async function LandingPage() {
         style={{ background: 'var(--bg-elevated)', borderTop: '1px solid var(--border)' }}
       >
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 70% 90% at 50% 50%, rgba(99,102,241,0.07) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 70% 90% at 50% 50%, rgba(99,102,241,0.05) 0%, transparent 70%)',
         }} />
         <div className="relative z-10 max-w-lg mx-auto">
           <div
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full mb-6"
             style={{
-              background: 'rgba(99,102,241,0.10)',
-              border: '1px solid rgba(99,102,241,0.25)',
-              color: 'var(--indigo-soft)',
+              background: 'rgba(99,102,241,0.08)',
+              border: '1px solid rgba(99,102,241,0.3)',
+              color: 'var(--indigo)',
             }}
           >
             <span className="text-[11px] font-mono tracking-[0.15em] uppercase">지금 시작하세요</span>
@@ -245,7 +219,7 @@ export default async function LandingPage() {
             width={140}
             height={76}
             className="object-contain"
-            style={{ height: '24px', width: 'auto', opacity: 0.7 }}
+            style={{ height: '24px', width: 'auto', opacity: 0.8, transform: 'scale(0.7)', transformOrigin: 'left center' }}
           />
         </div>
         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>

@@ -24,16 +24,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         {/* Logo */}
         <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
-          <Link href="/" className="flex flex-col gap-1">
-            <Image
-              src="/logo.png"
-              alt="CrossAsset"
-              width={140}
-              height={76}
-              className="object-contain"
-              style={{ height: '28px', width: 'auto' }}
-              priority
-            />
+          <Link href="/" className="flex flex-col gap-1 shrink-0">
+            <div style={{ height: '52px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+              <Image
+                src="/logo.png"
+                alt="CrossAsset"
+                width={2400}
+                height={1309}
+                style={{ height: '150px', width: 'auto', marginTop: '-49px', marginBottom: '-49px', transform: 'scale(0.7)', transformOrigin: 'left center' }}
+                priority
+              />
+            </div>
             <p className="text-[10px] font-mono px-0.5" style={{ color: 'var(--text-muted)' }}>
               Admin Console
             </p>

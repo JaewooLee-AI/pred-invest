@@ -21,10 +21,10 @@ function ProbBadge({ avg }: { avg: string }) {
   const v = parseFloat(avg)
   const styles =
     v >= 60
-      ? { color: 'var(--emerald)', background: 'var(--emerald-tint)', border: '1px solid var(--emerald-border)' }
+      ? { color: '#34c759', background: 'rgba(52,199,89,0.1)', border: '1px solid rgba(52,199,89,0.2)' }
       : v >= 40
-      ? { color: 'var(--amber)', background: 'var(--amber-tint)', border: '1px solid var(--amber-border)' }
-      : { color: 'var(--rose)', background: 'var(--rose-tint)', border: '1px solid var(--rose-border)' }
+      ? { color: '#ff9500', background: 'rgba(255,149,0,0.1)', border: '1px solid rgba(255,149,0,0.2)' }
+      : { color: '#ff3b30', background: 'rgba(255,59,48,0.1)', border: '1px solid rgba(255,59,48,0.2)' }
   return (
     <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full" style={styles}>
       {avg}%
@@ -42,23 +42,15 @@ function AssetCardContent({
   return (
     <button
       onClick={onClick}
-      className="rounded-xl h-full p-4 text-left w-full group"
-      style={{ background: 'var(--card)', border: '1px solid var(--border)', transition: 'border-color 180ms, background 180ms', cursor: 'pointer' }}
-      onMouseEnter={e => {
-        e.currentTarget.style.borderColor = 'var(--blue-border)'
-        e.currentTarget.style.background = 'var(--card-hover)'
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.borderColor = 'var(--border)'
-        e.currentTarget.style.background = 'var(--card)'
-      }}
+      className="rounded-[18px] h-full p-5 text-left w-full group card-hover bg-white"
+      style={{ cursor: 'pointer' }}
     >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{asset}</h3>
+        <h3 className="text-[17px] font-semibold text-[#1d1d1f]">{asset}</h3>
         <div className="flex items-center gap-2">
           {avgProb && <ProbBadge avg={avgProb} />}
           {/* Expand hint */}
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ color: '#86868b', opacity: 0.6 }}>
             <path d="M8 1h4v4M5 8l6.5-6.5M1 5V1h4M5 5.5 1.5 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
@@ -71,8 +63,8 @@ function AssetCardContent({
         </div>
       )}
       {comment && (
-        <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-          <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{comment}</p>
+        <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+          <p className="text-[14px] leading-[1.6] line-clamp-2 text-[#86868b]">{comment}</p>
         </div>
       )}
     </button>
@@ -96,28 +88,27 @@ function ChartModal({ selected, onClose }: { selected: SelectedChart; onClose: (
       onClick={onClose}
     >
       <div
-        className="relative max-w-3xl w-full rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl"
+        className="relative max-w-3xl w-full rounded-t-[24px] sm:rounded-[24px] overflow-hidden shadow-2xl bg-white"
         style={{
-          background: 'var(--card)',
-          border: '1px solid var(--border-strong)',
-          boxShadow: '0 16px 48px rgba(79,70,229,0.15), 0 4px 16px rgba(0,0,0,0.12)',
+          border: '1px solid rgba(0,0,0,0.05)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
         }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
           <div className="flex items-center gap-3">
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
+            <h3 className="text-[17px] font-semibold text-[#1d1d1f]">
               {selected.asset} — 상승 확률
             </h3>
             {avgProb && <ProbBadge avg={avgProb} />}
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-full text-lg transition-colors"
-            style={{ background: 'var(--bg)', color: 'var(--text-secondary)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--card-hover)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg)')}
+            className="w-8 h-8 flex items-center justify-center rounded-full text-xl transition-colors"
+            style={{ background: '#f5f5f7', color: '#86868b' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#e8e8ed')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#f5f5f7')}
           >
             ×
           </button>
@@ -130,8 +121,8 @@ function ChartModal({ selected, onClose }: { selected: SelectedChart; onClose: (
 
         {/* Comment */}
         {selected.comment && (
-          <div className="px-5 py-4" style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-elevated)' }}>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          <div className="px-6 py-5 bg-[#f5f5f7]" style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+            <p className="text-[15px] leading-[1.6] text-[#86868b]">
               {selected.comment}
             </p>
           </div>

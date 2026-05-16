@@ -74,15 +74,14 @@ const isAdmin = user?.email === ADMIN_EMAIL
     <nav
       className="sticky top-0 z-50"
       style={{
-        background: 'rgba(255,255,255,0.90)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid var(--border)',
-        boxShadow: '0 1px 0 rgba(79,70,229,0.06)',
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
       }}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 py-2">
-        {/* Logo — PNG has 32.6% whitespace top/bottom; clip to show only content */}
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 py-3">
+        {/* Logo */}
         <Link href="/" className="flex items-center shrink-0" onClick={() => setOpen(false)}>
           <div style={{ height: '52px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
             <Image
@@ -90,7 +89,7 @@ const isAdmin = user?.email === ADMIN_EMAIL
               alt="CrossAsset"
               width={2400}
               height={1309}
-              style={{ height: '150px', width: 'auto', marginTop: '-49px', marginBottom: '-49px' }}
+              style={{ height: '150px', width: 'auto', marginTop: '-49px', marginBottom: '-49px', transform: 'scale(0.7)', transformOrigin: 'left center' }}
               priority
             />
           </div>
@@ -120,9 +119,9 @@ const isAdmin = user?.email === ADMIN_EMAIL
               href="/admin"
               className="px-3 py-1.5 rounded-lg text-xs transition-all duration-150 ml-1"
               style={{
-                color: '#818cf8',
-                background: 'rgba(99,102,241,0.10)',
-                border: '1px solid rgba(99,102,241,0.20)',
+                color: '#1d1d1f',
+                background: '#f5f5f7',
+                border: '1px solid rgba(0,0,0,0.05)',
                 fontWeight: 500,
               }}
             >
@@ -141,7 +140,7 @@ const isAdmin = user?.email === ADMIN_EMAIL
               >
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
-                  style={{ background: 'linear-gradient(135deg, #6366f1, #a78bfa)', color: '#fff' }}
+                  style={{ background: '#0071e3', color: '#fff' }}
                 >
                   {initials}
                 </div>
@@ -159,11 +158,10 @@ const isAdmin = user?.email === ADMIN_EMAIL
 
               {showMenu && (
                 <div
-                  className="absolute right-0 top-full mt-1.5 w-44 rounded-xl overflow-hidden"
+                  className="absolute right-0 top-full mt-1.5 w-44 rounded-[12px] overflow-hidden bg-white"
                   style={{
-                    background: 'var(--card)',
-                    border: '1px solid var(--border-strong)',
-                    boxShadow: '0 8px 32px rgba(79,70,229,0.12)',
+                    border: '1px solid rgba(0,0,0,0.05)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
                   }}
                 >
                   <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
@@ -174,9 +172,8 @@ const isAdmin = user?.email === ADMIN_EMAIL
                     <form action={logoutAction}>
                       <button
                         type="submit"
-                        className="w-full px-3 py-2 text-xs rounded-lg text-left transition-colors"
-                        style={{ color: 'var(--rose)' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'var(--rose-tint)')}
+                        className="w-full px-3 py-2 text-xs rounded-lg text-left transition-colors text-[#e30000]"
+                        onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f7')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                       >
                         로그아웃
@@ -189,12 +186,10 @@ const isAdmin = user?.email === ADMIN_EMAIL
           ) : (
             <Link
               href="/login"
-              className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 hover:opacity-90"
-              style={{
-                background: 'linear-gradient(135deg, #6366f1, #818cf8)',
-                color: '#fff',
-                boxShadow: '0 0 16px rgba(99,102,241,0.25)',
-              }}
+              className="px-4 py-1.5 rounded-full text-xs font-normal transition-all duration-150"
+              style={{ background: '#0071e3', color: '#fff' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#0077ed'}
+              onMouseLeave={e => e.currentTarget.style.background = '#0071e3'}
             >
               로그인
             </Link>
@@ -254,7 +249,7 @@ const isAdmin = user?.email === ADMIN_EMAIL
               href="/admin"
               onClick={() => setOpen(false)}
               className="flex items-center px-3 py-2.5 rounded-xl text-sm font-medium"
-              style={{ color: '#818cf8' }}
+              style={{ color: '#1d1d1f' }}
             >
               관리자
             </Link>
@@ -273,8 +268,8 @@ const isAdmin = user?.email === ADMIN_EMAIL
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="flex items-center justify-center mx-2 py-2.5 rounded-xl text-sm font-semibold"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)', color: '#fff' }}
+              className="flex items-center justify-center mx-2 py-2.5 rounded-full text-sm font-normal"
+              style={{ background: '#0071e3', color: '#fff' }}
             >
               로그인
             </Link>

@@ -19,9 +19,9 @@ interface AssetChartProps {
 }
 
 const LINE_COLORS = {
-  A: '#60a5fa',
-  B: '#a78bfa',
-  C: '#34d399',
+  A: '#0071e3',
+  B: '#34c759',
+  C: '#ff9500',
 }
 
 const CustomTooltip = ({ active, payload, label }: {
@@ -31,19 +31,18 @@ const CustomTooltip = ({ active, payload, label }: {
 }) => {
   if (!active || !payload?.length) return null
   return (
-    <div
-      className="rounded-xl p-3 text-xs shadow-xl"
-      style={{
-        background: 'var(--card)',
-        border: '1px solid var(--border)',
-        boxShadow: '0 8px 24px rgba(79,70,229,0.10)',
-      }}
-    >
-      <p className="font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>{label}</p>
+      <div
+        className="rounded-[12px] p-3 text-[13px] bg-white"
+        style={{
+          border: '1px solid rgba(0,0,0,0.05)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+        }}
+      >
+      <p className="font-semibold mb-2 text-[#86868b]">{label}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ background: p.color }} />
-          <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
+          <span className="text-[#86868b]">{p.name}</span>
           <span className="font-mono font-semibold ml-auto" style={{ color: p.color }}>
             {p.value.toFixed(1)}%
           </span>
@@ -86,9 +85,9 @@ export function AssetChart({ data, height = 180 }: AssetChartProps) {
             dataKey={key}
             name={`모델 ${key}`}
             stroke={LINE_COLORS[key]}
-            strokeWidth={1.5}
+            strokeWidth={2}
             dot={false}
-            activeDot={{ r: 3 }}
+            activeDot={{ r: 4, strokeWidth: 0 }}
           />
         ))}
       </LineChart>

@@ -29,35 +29,79 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
 
   return (
     <>
-      <Divider />
-
-      {/* Prob & Index */}
+      {/* 1. DTW (Most Important) */}
       <section className="mb-14">
         <SectionHeader
-          title="예측 확률 & 예상 지수"
-          sub="자산별 상승 확률(점선) · 예상 지수(실선) 주간 예측"
-          badge="Prob / Index"
-          accent="var(--amber)"
-          accentTint="var(--amber-tint)"
-          accentBorder="var(--amber-border)"
-          dates={isAuthenticated ? probUploads.map(u => u.referenceDate) : []}
-          selectedDate={probData?.referenceDate ?? ''}
-          onSelectDate={setProbKey}
+          title="주간 DTW 궤적"
+          sub="현재 시장과 가장 유사한 과거 패턴 투사"
+          badge="DTW"
+          accent="var(--purple)"
+          accentTint="var(--purple-tint)"
+          accentBorder="var(--purple-border)"
+          dates={isAuthenticated ? weeklyShifts.map(s => s.label) : []}
+          selectedDate={weeklyShift?.label ?? ''}
+          onSelectDate={setDtwKey}
         />
         {isAuthenticated ? (
-          probData ? (
-            <ProbIndexCarousel probData={probData.probData} />
+          weeklyShift ? (
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {weeklyShift.assets.filter(a => a.data?.length > 0).slice(0, 3).map(asset => (
+                  <div
+                    key={asset.name}
+                    className="rounded-2xl p-5 card-hover bg-white"
+                    style={{ border: '1px solid rgba(0,0,0,0.05)' }}
+                  >
+                    <p
+                      className="text-[14px] font-semibold mb-4 px-2.5 py-1 rounded-md inline-block"
+                      style={{ color: '#1d1d1f', background: '#f5f5f7' }}
+                    >
+                      {asset.name}
+                    </p>
+                    <DtwChart
+                      assetName={asset.name}
+                      datasets={dtwShifts.map(s => ({
+                        label: s.label,
+                        data: s.assets.find(a => a.name === asset.name)?.data ?? [],
+                      }))}
+                    />
+                  </div>
+                ))}
+              </div>
+              {weeklyShift.assets.filter(a => a.data?.length > 0).length > 3 && (
+                <Link href="/weekly-shift" className="w-full">
+                  <div
+                    className="rounded-2xl flex items-center justify-center text-[14px] font-medium transition-colors py-3 cursor-pointer w-full"
+                    style={{
+                      border: '1px solid rgba(0,0,0,0.05)',
+                      background: '#f5f5f7',
+                      color: '#86868b',
+                    }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLDivElement).style.background = '#e8e8ed'
+                      ;(e.currentTarget as HTMLDivElement).style.color = '#1d1d1f'
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLDivElement).style.background = '#f5f5f7'
+                      ;(e.currentTarget as HTMLDivElement).style.color = '#86868b'
+                    }}
+                  >
+                    전체 자산 상세 분석 →
+                  </div>
+                </Link>
+              )}
+            </div>
           ) : (
-            <EmptyState msg="업로드된 확률/지수 데이터가 없습니다." href="/admin/upload-prob" cta="관리자 업로드" />
+            <EmptyState msg="주간 궤적 데이터가 없습니다." href="/admin/weekly-shift" cta="관리자 업로드" />
           )
         ) : (
-          <AuthGate />
+          <AuthGate compact />
         )}
       </section>
 
       <Divider />
 
-      {/* Classification */}
+      {/* 2. Classification */}
       <section className="mb-14">
         <SectionHeader
           title="다중 자산군 상승 확률"
@@ -83,144 +127,83 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
 
       <Divider />
 
-      {/* DTW + Notices grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* DTW */}
-        <section className="lg:col-span-8">
-          <SectionHeader
-            title="주간 DTW 궤적"
-            sub="현재 시장과 가장 유사한 과거 패턴 투사"
-            badge="DTW"
-            accent="var(--purple)"
-            accentTint="var(--purple-tint)"
-            accentBorder="var(--purple-border)"
-            dates={isAuthenticated ? weeklyShifts.map(s => s.label) : []}
-            selectedDate={weeklyShift?.label ?? ''}
-            onSelectDate={setDtwKey}
-          />
-          {isAuthenticated ? (
-            weeklyShift ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {weeklyShift.assets.filter(a => a.data?.length > 0).slice(0, 2).map(asset => (
-                  <div
-                    key={asset.name}
-                    className="rounded-2xl p-4"
-                    style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
-                  >
-                    <p
-                      className="text-xs font-semibold mb-3 px-2 py-0.5 rounded-md inline-block"
-                      style={{
-                        color: 'var(--purple)',
-                        background: 'var(--purple-tint)',
-                        border: '1px solid var(--purple-border)',
-                      }}
-                    >
-                      {asset.name}
-                    </p>
-                    <DtwChart
-                      assetName={asset.name}
-                      datasets={dtwShifts.map(s => ({
-                        label: s.label,
-                        data: s.assets.find(a => a.name === asset.name)?.data ?? [],
-                      }))}
-                    />
-                  </div>
-                ))}
-                {weeklyShift.assets.filter(a => a.data?.length > 0).length > 2 && (
-                  <Link href="/weekly-shift" className="sm:col-span-2">
-                    <div
-                      className="rounded-2xl flex items-center justify-center text-sm font-medium transition-colors py-5 cursor-pointer"
-                      style={{
-                        border: '1px dashed rgba(167,139,250,0.25)',
-                        color: 'var(--text-muted)',
-                      }}
-                      onMouseEnter={e => {
-                        (e.currentTarget as HTMLDivElement).style.background = 'var(--purple-tint)'
-                        ;(e.currentTarget as HTMLDivElement).style.color = 'var(--purple)'
-                      }}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLDivElement).style.background = 'transparent'
-                        ;(e.currentTarget as HTMLDivElement).style.color = 'var(--text-muted)'
-                      }}
-                    >
-                      +{weeklyShift.assets.filter(a => a.data?.length > 0).length - 2}개 더보기 →
-                    </div>
-                  </Link>
-                )}
-              </div>
-            ) : (
-              <EmptyState msg="주간 궤적 데이터가 없습니다." href="/admin/weekly-shift" cta="관리자 업로드" />
-            )
+      {/* 3. Prob & Index */}
+      <section className="mb-14">
+        <SectionHeader
+          title="예측 확률 & 예상 지수"
+          sub="자산별 상승 확률(점선) · 예상 지수(실선) 주간 예측"
+          badge="Prob / Index"
+          accent="var(--amber)"
+          accentTint="var(--amber-tint)"
+          accentBorder="var(--amber-border)"
+          dates={isAuthenticated ? probUploads.map(u => u.referenceDate) : []}
+          selectedDate={probData?.referenceDate ?? ''}
+          onSelectDate={setProbKey}
+        />
+        {isAuthenticated ? (
+          probData ? (
+            <ProbIndexCarousel probData={probData.probData} />
           ) : (
-            <AuthGate compact />
-          )}
-        </section>
+            <EmptyState msg="업로드된 확률/지수 데이터가 없습니다." href="/admin/upload-prob" cta="관리자 업로드" />
+          )
+        ) : (
+          <AuthGate />
+        )}
+      </section>
 
-        {/* Notices — visible to all */}
-        <section className="lg:col-span-4">
-          <SectionHeader
-            title="공지사항"
-            sub="최신 분석 리포트"
-            badge="Reports"
-            accent="var(--emerald)"
-            accentTint="var(--emerald-tint)"
-            accentBorder="var(--emerald-border)"
-          />
-          {notices.length > 0 ? (
-            <div className="flex flex-col gap-2">
-              {notices.slice(0, 4).map(n => (
-                <a
-                  key={n.id}
-                  href={n.filePath}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group rounded-xl p-4 block transition-all"
-                  style={{
-                    background: 'var(--card)',
-                    border: '1px solid var(--border)',
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border-strong)'
-                    ;(e.currentTarget as HTMLAnchorElement).style.background = 'var(--card-hover)'
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)'
-                    ;(e.currentTarget as HTMLAnchorElement).style.background = 'var(--card)'
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-sm"
-                      style={{ background: 'var(--emerald-tint)', border: '1px solid var(--emerald-border)' }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <rect x="1" y="1" width="12" height="12" rx="2" stroke="var(--emerald)" strokeWidth="1.2" />
-                        <path d="M4 5h6M4 7h6M4 9h4" stroke="var(--emerald)" strokeWidth="1.2" strokeLinecap="round" />
-                      </svg>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p
-                        className="text-xs font-semibold truncate transition-colors"
-                        style={{ color: 'var(--text)' }}
-                      >
-                        {n.filename}
-                      </p>
-                      <p className="text-xs mt-1 leading-relaxed line-clamp-2" style={{ color: 'var(--text-muted)' }}>
-                        {n.description}
-                      </p>
-                      <p className="text-[10px] mt-1.5 font-mono" style={{ color: 'var(--text-muted)' }}>
-                        {new Date(n.uploadedAt).toLocaleDateString('ko-KR')}
-                      </p>
-                    </div>
+      <Divider />
+
+      {/* 4. Notices */}
+      <section>
+        <SectionHeader
+          title="분석 리포트 및 공지사항"
+          sub="최신 분석 자료"
+          badge="Reports"
+          accent="var(--emerald)"
+          accentTint="var(--emerald-tint)"
+          accentBorder="var(--emerald-border)"
+        />
+        {notices.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {notices.slice(0, 4).map(n => (
+              <a
+                key={n.id}
+                href={n.filePath}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group rounded-[18px] p-5 block transition-all card-hover bg-white"
+              >
+                <div className="flex flex-col gap-3">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm"
+                    style={{ background: '#f5f5f7', border: '1px solid rgba(0,0,0,0.05)' }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 14 14" fill="none">
+                      <rect x="1" y="1" width="12" height="12" rx="2" stroke="#86868b" strokeWidth="1.2" />
+                      <path d="M4 5h6M4 7h6M4 9h4" stroke="#86868b" strokeWidth="1.2" strokeLinecap="round" />
+                    </svg>
                   </div>
-                </a>
-              ))}
-            </div>
-          ) : (
-            <EmptyState msg="공지사항이 없습니다." href="/admin/notice" cta="관리자 업로드" />
-          )}
-        </section>
-      </div>
+                  <div>
+                    <p
+                      className="text-[15px] font-semibold truncate transition-colors text-[#1d1d1f]"
+                    >
+                      {n.filename}
+                    </p>
+                    <p className="text-[13px] mt-1.5 leading-relaxed line-clamp-2 text-[#86868b]">
+                      {n.description}
+                    </p>
+                    <p className="text-[11px] mt-3 font-medium text-[#86868b]">
+                      {new Date(n.uploadedAt).toLocaleDateString('ko-KR')}
+                    </p>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <EmptyState msg="공지사항이 없습니다." href="/admin/notice" cta="관리자 업로드" />
+        )}
+      </section>
     </>
   )
 }
@@ -228,27 +211,27 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
 /* ─── Sub-components ─── */
 
 function SectionHeader({
-  title, sub, badge, accent, accentTint, accentBorder,
+  title, sub, badge,
   dates, selectedDate, onSelectDate,
 }: {
   title: string; sub: string
-  badge: string; accent: string; accentTint: string; accentBorder: string
+  badge: string; accent: string; accentTint: string; accentBorder: string // Kept for prop compat, ignoring unused
   dates?: string[]; selectedDate?: string; onSelectDate?: (v: string) => void
 }) {
   return (
     <div className="mb-6">
-      {/* Date row — above title */}
+      {/* Date row */}
       {dates && dates.length > 0 && (
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>기준일</span>
+          <span className="text-[13px] font-medium text-[#86868b]">기준일</span>
           {dates.length === 1 ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold font-mono" style={{ color: accent }}>
+              <span className="text-[14px] font-semibold text-[#1d1d1f]">
                 {selectedDate}
               </span>
               <span
-                className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
-                style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
+                className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                style={{ background: '#f5f5f7', color: '#86868b' }}
               >
                 최신
               </span>
@@ -257,11 +240,11 @@ function SectionHeader({
             <select
               value={selectedDate}
               onChange={e => onSelectDate?.(e.target.value)}
-              className="text-sm font-bold font-mono rounded-md border px-2 py-0.5 outline-none cursor-pointer"
-              style={{ borderColor: accentBorder, background: accentTint, color: accent }}
+              className="text-[14px] font-semibold rounded-md border px-2 py-0.5 outline-none cursor-pointer"
+              style={{ borderColor: 'rgba(0,0,0,0.1)', background: '#fff', color: '#1d1d1f' }}
             >
               {dates.map((d, i) => (
-                <option key={d} value={d} style={{ background: 'var(--card)', color: 'var(--text)' }}>
+                <option key={d} value={d}>
                   {d}{i === 0 ? ' (최신)' : ''}
                 </option>
               ))}
@@ -272,13 +255,13 @@ function SectionHeader({
       {/* Title row */}
       <div className="flex flex-wrap items-center gap-3">
         <span
-          className="text-[10px] font-semibold px-2.5 py-1 rounded-full tracking-wide"
-          style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
+          className="text-[12px] font-semibold px-2.5 py-1 rounded-full tracking-wide"
+          style={{ background: '#f5f5f7', color: '#1d1d1f' }}
         >
           {badge}
         </span>
-        <h2 className="text-base font-bold" style={{ color: 'var(--text)' }}>{title}</h2>
-        <span className="text-xs hidden sm:inline" style={{ color: 'var(--text-muted)' }}>{sub}</span>
+        <h2 className="text-[20px] font-semibold text-[#1d1d1f]">{title}</h2>
+        <span className="text-[15px] hidden sm:inline text-[#86868b]">{sub}</span>
       </div>
     </div>
   )
@@ -296,39 +279,33 @@ function Divider() {
 function AuthGate({ compact = false }: { compact?: boolean }) {
   return (
     <div
-      className={`rounded-2xl flex flex-col items-center justify-center text-center ${compact ? 'py-10' : 'py-16'}`}
+      className={`rounded-[18px] flex flex-col items-center justify-center text-center bg-white ${compact ? 'py-10' : 'py-16'}`}
       style={{
-        background: 'var(--card)',
-        border: '1px dashed var(--border-strong)',
+        border: '1px solid rgba(0,0,0,0.05)',
       }}
     >
       <div
-        className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
-        style={{
-          background: 'rgba(99,102,241,0.12)',
-          border: '1px solid rgba(99,102,241,0.25)',
-        }}
+        className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+        style={{ background: '#f5f5f7' }}
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <rect x="3" y="9" width="14" height="9" rx="2" stroke="#818cf8" strokeWidth="1.5" />
-          <path d="M7 9V6a3 3 0 016 0v3" stroke="#818cf8" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="10" cy="13.5" r="1.5" fill="#818cf8" />
+          <rect x="3" y="9" width="14" height="9" rx="2" stroke="#86868b" strokeWidth="1.5" />
+          <path d="M7 9V6a3 3 0 016 0v3" stroke="#86868b" strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="10" cy="13.5" r="1.5" fill="#86868b" />
         </svg>
       </div>
-      <p className="text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>
+      <p className="text-[17px] font-semibold mb-2 text-[#1d1d1f]">
         로그인 후 확인 가능합니다
       </p>
-      <p className="text-xs mb-5" style={{ color: 'var(--text-muted)' }}>
+      <p className="text-[14px] mb-6 text-[#86868b]">
         분석 데이터에 접근하려면 로그인하세요
       </p>
       <Link
         href="/login"
-        className="px-5 py-2 rounded-lg text-xs font-semibold transition-all hover:opacity-90"
-        style={{
-          background: 'linear-gradient(135deg, #6366f1, #818cf8)',
-          color: '#fff',
-          boxShadow: '0 0 16px rgba(99,102,241,0.25)',
-        }}
+        className="px-6 py-2 rounded-full text-[14px] font-normal transition-colors"
+        style={{ background: '#0071e3', color: '#fff' }}
+        onMouseEnter={e => e.currentTarget.style.background = '#0077ed'}
+        onMouseLeave={e => e.currentTarget.style.background = '#0071e3'}
       >
         로그인하기
       </Link>
@@ -339,14 +316,14 @@ function AuthGate({ compact = false }: { compact?: boolean }) {
 function EmptyState({ msg, cta, href }: { msg: string; cta: string; href: string }) {
   return (
     <div
-      className="rounded-2xl py-14 flex flex-col items-center justify-center text-center"
-      style={{ border: '1px dashed var(--border)', background: 'var(--card)' }}
+      className="rounded-[18px] py-16 flex flex-col items-center justify-center text-center bg-white"
+      style={{ border: '1px solid rgba(0,0,0,0.05)' }}
     >
-      <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>{msg}</p>
+      <p className="text-[15px] mb-4 text-[#86868b]">{msg}</p>
       <Link
         href={href}
-        className="text-xs transition-colors"
-        style={{ color: 'var(--indigo-soft)' }}
+        className="text-[14px] font-medium"
+        style={{ color: '#0071e3' }}
       >
         {cta} →
       </Link>

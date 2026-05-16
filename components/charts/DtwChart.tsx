@@ -50,19 +50,18 @@ const CustomTooltip = ({ active, payload, label }: {
   const visible = payload.filter(p => p.value !== undefined && p.value !== 0)
   if (!visible.length) return null
   return (
-    <div
-      className="rounded-xl p-3 text-xs shadow-xl"
-      style={{
-        background: 'var(--card)',
-        border: '1px solid var(--border)',
-        boxShadow: '0 8px 24px rgba(79,70,229,0.10)',
-      }}
-    >
-      <p className="font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>{label}</p>
+      <div
+        className="rounded-[12px] p-3 text-[13px] bg-white"
+        style={{
+          border: '1px solid rgba(0,0,0,0.05)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+        }}
+      >
+      <p className="font-semibold mb-2 text-[#86868b]">{label}</p>
       {visible.map(p => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ background: p.color }} />
-          <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
+          <span className="text-[#86868b]">{p.name}</span>
           <span className="font-mono font-semibold ml-auto" style={{ color: p.color }}>
             {p.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </span>
@@ -151,18 +150,18 @@ export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProp
           <Tooltip content={<CustomTooltip />} />
           <Legend wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }} iconType="circle" iconSize={6} />
           <Line type="monotone" dataKey="ensembleMaster"
-            name="Ensemble Master" stroke="#a78bfa" strokeWidth={2}
-            dot={false} activeDot={{ r: 3 }} />
+            name="Ensemble Master" stroke="#0071e3" strokeWidth={2.5}
+            dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#0071e3' }} />
           <Line type="monotone" dataKey="ensembleRank1"
-            name="Rank 1" stroke="#fbbf24" strokeWidth={1.5} strokeDasharray="5 3"
-            dot={false} activeDot={{ r: 3 }} />
+            name="Rank 1" stroke="#ff9500" strokeWidth={2} strokeDasharray="5 4"
+            dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#ff9500' }} />
           <Line type="monotone" dataKey="currentLevel"
-            name="Current Level" stroke="#94a3b8" strokeWidth={2}
-            dot={false} activeDot={{ r: 3 }} />
+            name="Current Level" stroke="#8e8e93" strokeWidth={2}
+            dot={false} activeDot={{ r: 3, strokeWidth: 0, fill: '#8e8e93' }} />
           {closingPrices && Object.keys(closingPrices).length > 0 && (
             <Line type="monotone" dataKey="actualClose"
-              name="실제 종가" stroke="#34d399" strokeWidth={1.5} strokeDasharray="4 2"
-              dot={false} activeDot={{ r: 3 }} connectNulls={false} />
+              name="실제 종가" stroke="#34c759" strokeWidth={2} strokeDasharray="3 3"
+              dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#34c759' }} connectNulls={false} />
           )}
         </LineChart>
       </ResponsiveContainer>

@@ -16,8 +16,8 @@ interface ProbIndexChartProps {
   height?: number
 }
 
-const PROB_COLOR = '#fbbf24'
-const INDEX_COLOR = '#60a5fa'
+const PROB_COLOR = '#ff9500'
+const INDEX_COLOR = '#0071e3'
 
 const CustomTooltip = ({ active, payload, label }: {
   active?: boolean
@@ -26,19 +26,18 @@ const CustomTooltip = ({ active, payload, label }: {
 }) => {
   if (!active || !payload?.length) return null
   return (
-    <div
-      className="rounded-xl p-3 text-xs shadow-xl"
-      style={{
-        background: 'var(--card)',
-        border: '1px solid var(--border)',
-        boxShadow: '0 8px 24px rgba(79,70,229,0.10)',
-      }}
-    >
-      <p className="font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>{label}</p>
+      <div
+        className="rounded-[12px] p-3 text-[13px] bg-white"
+        style={{
+          border: '1px solid rgba(0,0,0,0.05)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+        }}
+      >
+      <p className="font-semibold mb-2 text-[#86868b]">{label}</p>
       {payload.map(p => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ background: p.color }} />
-          <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
+          <span className="text-[#86868b]">{p.name}</span>
           <span className="font-mono font-semibold ml-auto" style={{ color: p.color }}>
             {p.dataKey === 'prob' ? `${p.value.toFixed(1)}%` : p.value.toFixed(2)}
           </span>
@@ -102,10 +101,10 @@ export function ProbIndexChart({ data, height = 180 }: ProbIndexChartProps) {
           dataKey="prob"
           name="상승 확률"
           stroke={PROB_COLOR}
-          strokeWidth={1}
-          strokeDasharray="5 3"
+          strokeWidth={1.5}
+          strokeDasharray="5 4"
           dot={false}
-          activeDot={{ r: 3 }}
+          activeDot={{ r: 4, strokeWidth: 0 }}
         />
         <Line
           yAxisId="index"
@@ -113,9 +112,9 @@ export function ProbIndexChart({ data, height = 180 }: ProbIndexChartProps) {
           dataKey="index"
           name="예상 지수"
           stroke={INDEX_COLOR}
-          strokeWidth={2.5}
+          strokeWidth={3}
           dot={false}
-          activeDot={{ r: 3 }}
+          activeDot={{ r: 4, strokeWidth: 0 }}
         />
       </ComposedChart>
     </ResponsiveContainer>
