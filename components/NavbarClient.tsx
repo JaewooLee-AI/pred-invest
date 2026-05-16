@@ -81,16 +81,16 @@ const isAdmin = user?.email === ADMIN_EMAIL
         boxShadow: '0 1px 0 rgba(79,70,229,0.06)',
       }}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 h-14">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 h-24">
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0" onClick={() => setOpen(false)}>
           <Image
             src="/logo.png"
             alt="CrossAsset"
-            width={140}
-            height={76}
+            width={330}
+            height={180}
             className="object-contain"
-            style={{ height: '32px', width: 'auto' }}
+            style={{ height: '80px', width: 'auto' }}
             priority
           />
         </Link>

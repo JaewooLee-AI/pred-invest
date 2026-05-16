@@ -31,7 +31,7 @@ export default async function LandingPage() {
 
       {/* ── NAV ─────────────────────────────── */}
       <nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-2"
         style={{
           background: 'rgba(255,255,255,0.90)',
           backdropFilter: 'blur(20px)',
@@ -44,10 +44,10 @@ export default async function LandingPage() {
           <Image
             src="/logo.png"
             alt="CrossAsset"
-            width={140}
-            height={76}
+            width={330}
+            height={180}
             className="object-contain"
-            style={{ height: '32px', width: 'auto' }}
+            style={{ height: '80px', width: 'auto' }}
             priority
           />
         </Link>
