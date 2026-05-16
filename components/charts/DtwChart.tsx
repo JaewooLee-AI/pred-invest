@@ -96,26 +96,23 @@ export function DtwChart({ datasets }: DtwChartProps) {
   return (
     <div>
       {availablePrev.length > 0 && (
-        <div className="flex items-center gap-1 mb-2">
-          <span className="text-[9px] mr-1" style={{ color: 'var(--text-muted)' }}>이전 포함</span>
-          {[0, ...availablePrev.map((_, i) => i + 1)].map(n => (
-            <button
-              key={n}
-              onClick={() => setPrevCount(n)}
-              className="text-[9px] px-1.5 py-0.5 rounded transition-all"
-              style={prevCount === n ? {
-                background: 'rgba(99,102,241,0.15)',
-                color: 'var(--purple)',
-                border: '1px solid var(--purple-border)',
-              } : {
-                background: 'transparent',
-                color: 'var(--text-muted)',
-                border: '1px solid transparent',
-              }}
-            >
-              {n === 0 ? '없음' : `${n}주 전`}
-            </button>
-          ))}
+        <div className="flex items-center gap-1.5 mb-2">
+          <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>이전 포함</span>
+          <select
+            value={prevCount}
+            onChange={e => setPrevCount(Number(e.target.value))}
+            className="text-[9px] font-mono rounded border px-1.5 py-0.5 outline-none cursor-pointer"
+            style={{
+              borderColor: 'var(--purple-border)',
+              background: 'var(--purple-tint)',
+              color: 'var(--purple)',
+            }}
+          >
+            <option value={0}>없음</option>
+            {availablePrev.map((_, i) => (
+              <option key={i + 1} value={i + 1}>{i + 1}주 전</option>
+            ))}
+          </select>
         </div>
       )}
 

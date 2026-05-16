@@ -46,7 +46,7 @@ export default async function WeeklyShiftPage() {
 
         {/* Legend */}
         <div
-          className="rounded-2xl p-5 mb-10 grid grid-cols-1 sm:grid-cols-3 gap-5"
+          className="rounded-2xl p-5 mb-6 grid grid-cols-1 sm:grid-cols-3 gap-5"
           style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
         >
           <div className="flex items-start gap-3">
@@ -81,6 +81,31 @@ export default async function WeeklyShiftPage() {
               <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>회색 실선 — Current Level</p>
               <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 현재 가격 수준 (기준선)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Multi-period explanation */}
+        <div
+          className="rounded-2xl p-5 mb-10"
+          style={{ background: 'var(--purple-tint)', border: '1px solid var(--purple-border)' }}
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+              style={{ background: 'rgba(167,139,250,0.2)', border: '1px solid var(--purple-border)' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7h10M7 2l5 5-5 5" stroke="#a78bfa" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold mb-1" style={{ color: 'var(--purple)' }}>이전 기간 데이터 연결</p>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                각 차트 상단의 <span className="font-semibold">이전 포함</span> 드롭다운에서 포함할 이전 주 수를 선택하면,
+                해당 주차의 기준일부터 현재 기준일 직전까지의 데이터를 이어붙여 더 넓은 기간의 궤적을 확인할 수 있습니다.
+                이전 기간 데이터는 현재 기준일 데이터와 겹치지 않는 날짜만 추가되며, 동일한 색상의 연속 선으로 표시됩니다.
               </p>
             </div>
           </div>
