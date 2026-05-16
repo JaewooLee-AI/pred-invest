@@ -13,7 +13,7 @@ export interface DtwDataset {
 
 interface DtwChartProps {
   datasets: DtwDataset[]
-  assetName: string
+  assetName?: string
 }
 
 type MergedPoint = Record<string, number | string | undefined>
