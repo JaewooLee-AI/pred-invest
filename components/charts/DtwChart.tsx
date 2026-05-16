@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
@@ -16,28 +17,42 @@ interface DtwChartProps {
   assetName?: string
 }
 
-type MergedPoint = Record<string, number | string | undefined>
+interface UnifiedPoint {
+  date: string
+  ensembleMaster?: number
+  ensembleRank1?: number
+  currentLevel?: number
+  prevMaster?: number
+  prevRank1?: number
+}
 
-function buildMergedData(datasets: DtwDataset[]): MergedPoint[] {
-  const allDates = Array.from(
-    new Set(datasets.flatMap(ds => ds.data.map(p => p.date)))
-  ).sort()
+function buildUnifiedData(current: DtwDataPoint[], prevDatasets: DtwDataset[]): UnifiedPoint[] {
+  const currentDates = new Set(current.map(d => d.date))
 
-  const maps = datasets.map(ds => new Map(ds.data.map(p => [p.date, p])))
+  // 현재에 없는 날짜만 이전 데이터에서 수집 (최신 이전 우선)
+  const prevMap = new Map<string, { master: number; rank1: number }>()
+  for (const ds of [...prevDatasets].reverse()) {
+    for (const p of ds.data) {
+      if (!currentDates.has(p.date)) {
+        prevMap.set(p.date, { master: p.ensembleMaster, rank1: p.ensembleRank1 })
+      }
+    }
+  }
+
+  const currMap = new Map(current.map(d => [d.date, d]))
+  const allDates = Array.from(new Set([...prevMap.keys(), ...current.map(d => d.date)])).sort()
 
   return allDates.map(date => {
-    const point: MergedPoint = { date }
-    maps.forEach((m, i) => {
-      const p = m.get(date)
-      if (i <= 1) {
-        // 최신 2개: ensemble + currentLevel 모두
-        point[`master_${i}`] = p?.ensembleMaster
-        point[`rank1_${i}`] = p?.ensembleRank1
-      }
-      // 모든 데이터: currentLevel
-      point[`level_${i}`] = p?.currentLevel
-    })
-    return point
+    const c = currMap.get(date)
+    const p = prevMap.get(date)
+    return {
+      date,
+      ensembleMaster: c?.ensembleMaster,
+      ensembleRank1: c?.ensembleRank1,
+      currentLevel: c?.currentLevel,
+      prevMaster: p?.master,
+      prevRank1: p?.rank1,
+    }
   })
 }
 
@@ -72,10 +87,13 @@ const CustomTooltip = ({ active, payload, label }: {
   )
 }
 
-export function DtwChart({ datasets, assetName }: DtwChartProps) {
-  const validDatasets = datasets.filter(ds => ds.data.length > 0)
+export function DtwChart({ datasets }: DtwChartProps) {
+  const [prevCount, setPrevCount] = useState(0)
 
-  if (validDatasets.length === 0) {
+  const current = datasets[0]?.data ?? []
+  const availablePrev = datasets.slice(1)
+
+  if (current.length === 0) {
     return (
       <div className="flex items-center justify-center h-[200px] text-xs" style={{ color: 'var(--text-muted)' }}>
         데이터 없음
@@ -83,13 +101,13 @@ export function DtwChart({ datasets, assetName }: DtwChartProps) {
     )
   }
 
-  const merged = buildMergedData(validDatasets)
+  const prevDatasets = availablePrev.slice(0, prevCount)
+  const merged = buildUnifiedData(current, prevDatasets)
+  const hasPrev = prevCount > 0 && prevDatasets.some(ds => ds.data.length > 0)
 
-  const allValues = merged.flatMap(p =>
-    Object.entries(p)
-      .filter(([k]) => k !== 'date')
-      .map(([, v]) => v as number)
-  ).filter(v => v !== undefined && v !== 0)
+  const allValues = merged.flatMap(p => [
+    p.ensembleMaster, p.ensembleRank1, p.currentLevel, p.prevMaster, p.prevRank1,
+  ]).filter((v): v is number => v !== undefined && v !== 0)
 
   const minVal = Math.min(...allValues)
   const maxVal = Math.max(...allValues)
@@ -102,69 +120,79 @@ export function DtwChart({ datasets, assetName }: DtwChartProps) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <LineChart data={merged} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-        <XAxis
-          dataKey="date"
-          tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
-          tickLine={false}
-          axisLine={{ stroke: 'rgba(0,0,0,0.08)' }}
-          interval="preserveStartEnd"
-          tickFormatter={formatDate}
-        />
-        <YAxis
-          domain={yDomain}
-          tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
-          tickLine={false}
-          axisLine={false}
-          width={55}
-          tickFormatter={v => v.toLocaleString()}
-        />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }} iconType="circle" iconSize={6} />
+    <div>
+      {/* 이전 기간 포함 토글 */}
+      {availablePrev.length > 0 && (
+        <div className="flex items-center gap-1 mb-2">
+          <span className="text-[9px] mr-1" style={{ color: 'var(--text-muted)' }}>이전 포함</span>
+          {[0, ...availablePrev.map((_, i) => i + 1)].map(n => (
+            <button
+              key={n}
+              onClick={() => setPrevCount(n)}
+              className="text-[9px] px-1.5 py-0.5 rounded transition-all"
+              style={prevCount === n ? {
+                background: n === 0 ? 'rgba(99,102,241,0.15)' : 'rgba(239,68,68,0.15)',
+                color: n === 0 ? 'var(--purple)' : '#ef4444',
+                border: `1px solid ${n === 0 ? 'var(--purple-border)' : 'rgba(239,68,68,0.3)'}`,
+              } : {
+                background: 'transparent',
+                color: 'var(--text-muted)',
+                border: '1px solid transparent',
+              }}
+            >
+              {n === 0 ? '없음' : `${n}주 전`}
+            </button>
+          ))}
+        </div>
+      )}
 
-        {validDatasets.map((ds, i) => {
-          const label = ds.label
-          if (i === 0) {
-            // 최신: 기본 색상 실선
-            return [
-              <Line key={`master_${i}`} type="monotone" dataKey={`master_${i}`}
-                name="Ensemble Master" stroke="#a78bfa" strokeWidth={2}
-                dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />,
-              <Line key={`rank1_${i}`} type="monotone" dataKey={`rank1_${i}`}
-                name="Rank 1" stroke="#fbbf24" strokeWidth={1.5} strokeDasharray="5 3"
-                dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />,
-              <Line key={`level_${i}`} type="monotone" dataKey={`level_${i}`}
-                name="Current Level" stroke="#94a3b8" strokeWidth={2}
-                dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />,
-            ]
-          }
-          if (i === 1) {
-            // 이전 1주: 적색으로 명확히 구분
-            return [
-              <Line key={`master_${i}`} type="monotone" dataKey={`master_${i}`}
-                name={`Prev Master (${label})`} stroke="#ef4444" strokeWidth={1.5}
-                dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />,
-              <Line key={`rank1_${i}`} type="monotone" dataKey={`rank1_${i}`}
-                name={`Prev Rank1 (${label})`} stroke="#ef4444" strokeWidth={1}
-                strokeDasharray="5 3"
-                dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />,
-              <Line key={`level_${i}`} type="monotone" dataKey={`level_${i}`}
-                name={`Prev Level (${label})`} stroke="#fca5a5" strokeWidth={1}
-                strokeDasharray="3 3"
-                dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />,
-            ]
-          }
-          // 2번째 이상: 적색 계열 currentLevel만
-          return [
-            <Line key={`level_${i}`} type="monotone" dataKey={`level_${i}`}
-              name={`Level (${label})`} stroke="#fca5a5" strokeWidth={1}
-              strokeDasharray="2 4"
-              dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />,
-          ]
-        })}
-      </LineChart>
-    </ResponsiveContainer>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={merged} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+          <XAxis
+            dataKey="date"
+            tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
+            tickLine={false}
+            axisLine={{ stroke: 'rgba(0,0,0,0.08)' }}
+            interval="preserveStartEnd"
+            tickFormatter={formatDate}
+          />
+          <YAxis
+            domain={yDomain}
+            tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
+            tickLine={false}
+            axisLine={false}
+            width={55}
+            tickFormatter={v => v.toLocaleString()}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }} iconType="circle" iconSize={6} />
+
+          {/* 이전 기간 — 적색 (현재에 없는 날짜만) */}
+          {hasPrev && (
+            <Line type="monotone" dataKey="prevMaster"
+              name="Prev Master" stroke="#ef4444" strokeWidth={1.5}
+              dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />
+          )}
+          {hasPrev && (
+            <Line type="monotone" dataKey="prevRank1"
+              name="Prev Rank 1" stroke="#ef4444" strokeWidth={1}
+              strokeDasharray="5 3"
+              dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />
+          )}
+
+          {/* 현재 기간 — 기본 색상 */}
+          <Line type="monotone" dataKey="ensembleMaster"
+            name="Ensemble Master" stroke="#a78bfa" strokeWidth={2}
+            dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />
+          <Line type="monotone" dataKey="ensembleRank1"
+            name="Rank 1" stroke="#fbbf24" strokeWidth={1.5} strokeDasharray="5 3"
+            dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />
+          <Line type="monotone" dataKey="currentLevel"
+            name="Current Level" stroke="#94a3b8" strokeWidth={2}
+            dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   )
 }
