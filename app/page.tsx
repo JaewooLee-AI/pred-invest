@@ -31,7 +31,7 @@ export default async function LandingPage() {
 
       {/* ── NAV ─────────────────────────────── */}
       <nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-2"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-1"
         style={{
           background: 'rgba(255,255,255,0.90)',
           backdropFilter: 'blur(20px)',

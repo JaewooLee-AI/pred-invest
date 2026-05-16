@@ -81,7 +81,7 @@ const isAdmin = user?.email === ADMIN_EMAIL
         boxShadow: '0 1px 0 rgba(79,70,229,0.06)',
       }}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 h-24">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 py-1">
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0" onClick={() => setOpen(false)}>
           <Image
