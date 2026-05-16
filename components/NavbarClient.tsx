@@ -81,18 +81,19 @@ const isAdmin = user?.email === ADMIN_EMAIL
         boxShadow: '0 1px 0 rgba(79,70,229,0.06)',
       }}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 py-1">
-        {/* Logo */}
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 py-2">
+        {/* Logo — PNG has 32.6% whitespace top/bottom; clip to show only content */}
         <Link href="/" className="flex items-center shrink-0" onClick={() => setOpen(false)}>
-          <Image
-            src="/logo.png"
-            alt="CrossAsset"
-            width={330}
-            height={180}
-            className="object-contain"
-            style={{ height: '80px', width: 'auto' }}
-            priority
-          />
+          <div style={{ height: '52px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+            <Image
+              src="/logo.png"
+              alt="CrossAsset"
+              width={2400}
+              height={1309}
+              style={{ height: '150px', width: 'auto', marginTop: '-49px', marginBottom: '-49px' }}
+              priority
+            />
+          </div>
         </Link>
 
         {/* Desktop nav */}

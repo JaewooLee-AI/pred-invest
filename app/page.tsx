@@ -41,15 +41,16 @@ export default async function LandingPage() {
         }}
       >
         <Link href="/" className="flex items-center shrink-0">
-          <Image
-            src="/logo.png"
-            alt="CrossAsset"
-            width={330}
-            height={180}
-            className="object-contain"
-            style={{ height: '80px', width: 'auto' }}
-            priority
-          />
+          <div style={{ height: '52px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+            <Image
+              src="/logo.png"
+              alt="CrossAsset"
+              width={2400}
+              height={1309}
+              style={{ height: '150px', width: 'auto', marginTop: '-49px', marginBottom: '-49px' }}
+              priority
+            />
+          </div>
         </Link>
         <LandingLoginButton variant="nav" />
       </nav>
