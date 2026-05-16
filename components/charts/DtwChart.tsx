@@ -72,9 +72,6 @@ const CustomTooltip = ({ active, payload, label }: {
   )
 }
 
-// 오래된 데이터일수록 점점 연하게
-const LEVEL_COLORS = ['#94a3b8', '#64748b', '#475569']
-
 export function DtwChart({ datasets, assetName }: DtwChartProps) {
   const validDatasets = datasets.filter(ds => ds.data.length > 0)
 
@@ -130,7 +127,7 @@ export function DtwChart({ datasets, assetName }: DtwChartProps) {
         {validDatasets.map((ds, i) => {
           const label = ds.label
           if (i === 0) {
-            // 최신: 모두 실선으로
+            // 최신: 기본 색상 실선
             return [
               <Line key={`master_${i}`} type="monotone" dataKey={`master_${i}`}
                 name="Ensemble Master" stroke="#a78bfa" strokeWidth={2}
@@ -144,28 +141,27 @@ export function DtwChart({ datasets, assetName }: DtwChartProps) {
             ]
           }
           if (i === 1) {
-            // 이전 1주: ensemble 계열 연한 점선 + currentLevel
+            // 이전 1주: 적색으로 명확히 구분
             return [
               <Line key={`master_${i}`} type="monotone" dataKey={`master_${i}`}
-                name={`Master (${label})`} stroke="#a78bfa" strokeWidth={1}
-                strokeDasharray="4 4" strokeOpacity={0.35}
-                dot={false} activeDot={{ r: 2 }} connectNulls legendType="none" />,
+                name={`Prev Master (${label})`} stroke="#ef4444" strokeWidth={1.5}
+                dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />,
               <Line key={`rank1_${i}`} type="monotone" dataKey={`rank1_${i}`}
-                name={`Rank1 (${label})`} stroke="#fbbf24" strokeWidth={1}
-                strokeDasharray="4 4" strokeOpacity={0.35}
-                dot={false} activeDot={{ r: 2 }} connectNulls legendType="none" />,
+                name={`Prev Rank1 (${label})`} stroke="#ef4444" strokeWidth={1}
+                strokeDasharray="5 3"
+                dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />,
               <Line key={`level_${i}`} type="monotone" dataKey={`level_${i}`}
-                name={`Level (${label})`} stroke={LEVEL_COLORS[1]} strokeWidth={1}
-                strokeOpacity={0.5} strokeDasharray="3 3"
-                dot={false} activeDot={{ r: 2 }} connectNulls legendType="none" />,
+                name={`Prev Level (${label})`} stroke="#fca5a5" strokeWidth={1}
+                strokeDasharray="3 3"
+                dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />,
             ]
           }
-          // 2번째 이상 오래된 것: currentLevel만
+          // 2번째 이상: 적색 계열 currentLevel만
           return [
             <Line key={`level_${i}`} type="monotone" dataKey={`level_${i}`}
-              name={`Level (${label})`} stroke={LEVEL_COLORS[Math.min(i, LEVEL_COLORS.length - 1)]}
-              strokeWidth={1} strokeOpacity={0.3} strokeDasharray="2 4"
-              dot={false} activeDot={{ r: 2 }} connectNulls legendType="none" />,
+              name={`Level (${label})`} stroke="#fca5a5" strokeWidth={1}
+              strokeDasharray="2 4"
+              dot={false} activeDot={{ r: 2 }} connectNulls legendType="circle" />,
           ]
         })}
       </LineChart>
