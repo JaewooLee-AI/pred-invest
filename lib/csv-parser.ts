@@ -17,6 +17,13 @@ export interface DtwDataPoint {
   currentLevel: number
 }
 
+function normalizeDateString(d: string): string {
+  // "YYYY.M.D" → "YYYY-MM-DD"
+  const m = d.match(/^(\d{4})\.(\d{1,2})\.(\d{1,2})$/)
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`
+  return d
+}
+
 export function parseDtwCsvText(text: string): DtwDataPoint[] {
   const lines = text.split('\n').filter(l => l.trim())
   if (lines.length < 2) return []
@@ -32,7 +39,7 @@ export function parseDtwCsvText(text: string): DtwDataPoint[] {
     const cols = lines[i].split(',').map(s => s.trim())
     if (!cols[0]) continue
     result.push({
-      date: cols[0],
+      date: normalizeDateString(cols[0]),
       ensembleMaster: parseFloat(cols[masterIdx]) || 0,
       ensembleRank1: rank1Idx >= 0 ? (parseFloat(cols[rank1Idx]) || 0) : 0,
       currentLevel: levelIdx >= 0 ? (parseFloat(cols[levelIdx]) || 0) : 0,
