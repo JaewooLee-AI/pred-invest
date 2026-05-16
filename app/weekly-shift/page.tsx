@@ -63,7 +63,7 @@ export default async function WeeklyShiftPage() {
           <div className="flex items-start gap-3">
             <div className="flex items-center gap-[3px] mt-1 shrink-0">
               {[0, 1, 2, 3].map(i => (
-                <div key={i} className="w-2 h-[2.5px] rounded-full" style={{ background: '#fbbf24' }} />
+                <div key={i} className="w-2 h-[2.5px] rounded-full" style={{ background: '#ff9500' }} />
               ))}
             </div>
             <div>

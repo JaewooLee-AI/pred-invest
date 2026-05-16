@@ -1,6 +1,6 @@
 import { Navbar } from '@/components/Navbar'
 import { DashboardContent } from '@/components/DashboardContent'
-import { getAllCsvUploads, getAllProbUploads, getAllWeeklyShifts, getAllNotices } from '@/lib/db'
+import { getAllCsvUploads, getAllProbUploads, getAllWeeklyShifts, getAllNotices, getClosingPrices } from '@/lib/db'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 
@@ -14,11 +14,12 @@ export default async function DashboardPage() {
     redirect('/')
   }
 
-  const [csvUploads, probUploads, weeklyShifts, notices] = await Promise.all([
+  const [csvUploads, probUploads, weeklyShifts, notices, closingPrices] = await Promise.all([
     getAllCsvUploads(),
     getAllProbUploads(),
     getAllWeeklyShifts(),
     getAllNotices(),
+    getClosingPrices(),
   ])
 
   return (
@@ -54,6 +55,7 @@ export default async function DashboardPage() {
           probUploads={probUploads}
           weeklyShifts={weeklyShifts}
           notices={notices}
+          closingPrices={closingPrices}
           isAuthenticated={true}
         />
       </main>

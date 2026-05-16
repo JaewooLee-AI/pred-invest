@@ -6,19 +6,29 @@ import { ChartCarousel } from '@/components/charts/ChartCarousel'
 import { ProbIndexCarousel } from '@/components/charts/ProbIndexCarousel'
 import { DtwChart } from '@/components/charts/DtwChart'
 import type { CsvUpload, ProbUpload, WeeklyShift, Notice } from '@/lib/db'
+import type { ClosingPriceData } from '@/lib/csv-parser'
 
 interface Props {
   csvUploads: CsvUpload[]
   probUploads: ProbUpload[]
   weeklyShifts: WeeklyShift[]
   notices: Notice[]
+  closingPrices?: ClosingPriceData
   isAuthenticated: boolean
 }
 
-export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notices, isAuthenticated }: Props) {
+export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notices, closingPrices = {}, isAuthenticated }: Props) {
   const [csvKey, setCsvKey] = useState(csvUploads[0]?.referenceDate ?? '')
   const [probKey, setProbKey] = useState(probUploads[0]?.referenceDate ?? '')
   const [dtwKey, setDtwKey] = useState(weeklyShifts[0]?.label ?? '')
+
+  function getAssetClosingPrices(assetName: string): Record<string, number> {
+    const result: Record<string, number> = {}
+    for (const [date, assets] of Object.entries(closingPrices)) {
+      if (assets[assetName] !== undefined) result[date] = assets[assetName]
+    }
+    return result
+  }
 
   const csvData = csvUploads.find(u => u.referenceDate === csvKey) ?? csvUploads[0] ?? null
   const probData = probUploads.find(u => u.referenceDate === probKey) ?? probUploads[0] ?? null
@@ -64,6 +74,7 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
                         label: s.label,
                         data: s.assets.find(a => a.name === asset.name)?.data ?? [],
                       }))}
+                      closingPrices={getAssetClosingPrices(asset.name)}
                     />
                   </div>
                 ))}
@@ -211,11 +222,11 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
 /* ─── Sub-components ─── */
 
 function SectionHeader({
-  title, sub, badge,
+  title, sub, badge, accent, accentTint, accentBorder,
   dates, selectedDate, onSelectDate,
 }: {
   title: string; sub: string
-  badge: string; accent: string; accentTint: string; accentBorder: string // Kept for prop compat, ignoring unused
+  badge: string; accent: string; accentTint: string; accentBorder: string
   dates?: string[]; selectedDate?: string; onSelectDate?: (v: string) => void
 }) {
   return (
@@ -231,7 +242,7 @@ function SectionHeader({
               </span>
               <span
                 className="text-[11px] font-medium px-2 py-0.5 rounded-full"
-                style={{ background: '#f5f5f7', color: '#86868b' }}
+                style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
               >
                 최신
               </span>
@@ -241,7 +252,7 @@ function SectionHeader({
               value={selectedDate}
               onChange={e => onSelectDate?.(e.target.value)}
               className="text-[14px] font-semibold rounded-md border px-2 py-0.5 outline-none cursor-pointer"
-              style={{ borderColor: 'rgba(0,0,0,0.1)', background: '#fff', color: '#1d1d1f' }}
+              style={{ borderColor: accentBorder, background: accentTint, color: accent }}
             >
               {dates.map((d, i) => (
                 <option key={d} value={d}>
@@ -256,7 +267,7 @@ function SectionHeader({
       <div className="flex flex-wrap items-center gap-3">
         <span
           className="text-[12px] font-semibold px-2.5 py-1 rounded-full tracking-wide"
-          style={{ background: '#f5f5f7', color: '#1d1d1f' }}
+          style={{ background: accentTint, border: `1px solid ${accentBorder}`, color: accent }}
         >
           {badge}
         </span>
