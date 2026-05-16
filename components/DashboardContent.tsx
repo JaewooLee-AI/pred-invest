@@ -23,6 +23,9 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
   const csvData = csvUploads.find(u => u.referenceDate === csvKey) ?? csvUploads[0] ?? null
   const probData = probUploads.find(u => u.referenceDate === probKey) ?? probUploads[0] ?? null
   const weeklyShift = weeklyShifts.find(s => s.label === dtwKey) ?? weeklyShifts[0] ?? null
+  const dtwSelectedIdx = weeklyShifts.findIndex(s => s.label === weeklyShift?.label)
+  // 최신 기준으로 최대 3개 합산 (선택일 + 이전 2개)
+  const dtwShifts = weeklyShifts.slice(dtwSelectedIdx, dtwSelectedIdx + 3)
 
   return (
     <>
@@ -114,7 +117,13 @@ export function DashboardContent({ csvUploads, probUploads, weeklyShifts, notice
                     >
                       {asset.name}
                     </p>
-                    <DtwChart data={asset.data} assetName={asset.name} />
+                    <DtwChart
+                      assetName={asset.name}
+                      datasets={dtwShifts.map(s => ({
+                        label: s.label,
+                        data: s.assets.find(a => a.name === asset.name)?.data ?? [],
+                      }))}
+                    />
                   </div>
                 ))}
                 {weeklyShift.assets.filter(a => a.data?.length > 0).length > 2 && (

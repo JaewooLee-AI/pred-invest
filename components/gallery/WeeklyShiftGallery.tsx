@@ -2,17 +2,31 @@
 
 import { useState } from 'react'
 import { DtwChart } from '@/components/charts/DtwChart'
-import type { AssetShift } from '@/lib/db'
+import type { WeeklyShift } from '@/lib/db'
 
 interface WeeklyShiftGalleryProps {
-  assets: AssetShift[]
+  shifts: WeeklyShift[]
 }
 
-export function WeeklyShiftGallery({ assets }: WeeklyShiftGalleryProps) {
-  const [selected, setSelected] = useState<AssetShift | null>(null)
-  const activeAssets = assets.filter(a => a.data?.length > 0)
+export function WeeklyShiftGallery({ shifts }: WeeklyShiftGalleryProps) {
+  const [selectedName, setSelectedName] = useState<string | null>(null)
 
+  const primary = shifts[0]
+  if (!primary) return null
+
+  const activeAssets = primary.assets.filter(a => a.data?.length > 0)
   if (activeAssets.length === 0) return null
+
+  const selectedAsset = activeAssets.find(a => a.name === selectedName) ?? null
+
+  function getDatasetsForAsset(assetName: string) {
+    return shifts
+      .map(s => ({
+        label: s.label,
+        data: s.assets.find(a => a.name === assetName)?.data ?? [],
+      }))
+      .filter(ds => ds.data.length > 0)
+  }
 
   return (
     <>
@@ -20,7 +34,7 @@ export function WeeklyShiftGallery({ assets }: WeeklyShiftGalleryProps) {
         {activeAssets.map(asset => (
           <button
             key={asset.name}
-            onClick={() => setSelected(asset)}
+            onClick={() => setSelectedName(asset.name)}
             className="group rounded-2xl p-4 text-left transition-all"
             style={{
               background: 'var(--card)',
@@ -41,7 +55,7 @@ export function WeeklyShiftGallery({ assets }: WeeklyShiftGalleryProps) {
             >
               {asset.name}
             </p>
-            <DtwChart data={asset.data} assetName={asset.name} />
+            <DtwChart datasets={getDatasetsForAsset(asset.name)} assetName={asset.name} />
             {asset.description && (
               <p className="text-[10px] mt-2 line-clamp-2" style={{ color: 'var(--text-muted)' }}>
                 {asset.description}
@@ -51,11 +65,11 @@ export function WeeklyShiftGallery({ assets }: WeeklyShiftGalleryProps) {
         ))}
       </div>
 
-      {selected && (
+      {selectedAsset && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
           style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
-          onClick={() => setSelected(null)}
+          onClick={() => setSelectedName(null)}
         >
           <div
             className="relative max-w-3xl w-full rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl"
@@ -68,10 +82,10 @@ export function WeeklyShiftGallery({ assets }: WeeklyShiftGalleryProps) {
           >
             <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: '1px solid var(--border)' }}>
               <h3 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
-                {selected.name} — DTW 궤적
+                {selectedAsset.name} — DTW 궤적
               </h3>
               <button
-                onClick={() => setSelected(null)}
+                onClick={() => setSelectedName(null)}
                 className="w-7 h-7 flex items-center justify-center rounded-full transition-colors text-lg"
                 style={{ background: 'var(--bg)', color: 'var(--text-secondary)' }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'var(--card-hover)')}
@@ -81,12 +95,12 @@ export function WeeklyShiftGallery({ assets }: WeeklyShiftGalleryProps) {
               </button>
             </div>
             <div className="p-6">
-              <DtwChart data={selected.data} assetName={selected.name} />
+              <DtwChart datasets={getDatasetsForAsset(selectedAsset.name)} assetName={selectedAsset.name} />
             </div>
-            {selected.description && (
+            {selectedAsset.description && (
               <div className="px-5 py-4" style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-elevated)' }}>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  {selected.description}
+                  {selectedAsset.description}
                 </p>
               </div>
             )}

@@ -10,7 +10,8 @@ interface WeeklyShiftViewerProps {
 
 export function WeeklyShiftViewer({ shifts }: WeeklyShiftViewerProps) {
   const [selectedLabel, setSelectedLabel] = useState(shifts[0]?.label ?? '')
-  const current = shifts.find(s => s.label === selectedLabel) ?? shifts[0]
+  const selectedIdx = shifts.findIndex(s => s.label === selectedLabel)
+  const activeShifts = shifts.slice(selectedIdx, selectedIdx + 3)
 
   return (
     <div>
@@ -39,7 +40,7 @@ export function WeeklyShiftViewer({ shifts }: WeeklyShiftViewerProps) {
         })}
       </div>
 
-      {current && <WeeklyShiftGallery assets={current.assets} />}
+      {activeShifts.length > 0 && <WeeklyShiftGallery shifts={activeShifts} />}
     </div>
   )
 }

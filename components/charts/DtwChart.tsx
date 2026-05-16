@@ -6,9 +6,39 @@ import {
 } from 'recharts'
 import type { DtwDataPoint } from '@/lib/csv-parser'
 
-interface DtwChartProps {
+export interface DtwDataset {
+  label: string
   data: DtwDataPoint[]
+}
+
+interface DtwChartProps {
+  datasets: DtwDataset[]
   assetName: string
+}
+
+type MergedPoint = Record<string, number | string | undefined>
+
+function buildMergedData(datasets: DtwDataset[]): MergedPoint[] {
+  const allDates = Array.from(
+    new Set(datasets.flatMap(ds => ds.data.map(p => p.date)))
+  ).sort()
+
+  const maps = datasets.map(ds => new Map(ds.data.map(p => [p.date, p])))
+
+  return allDates.map(date => {
+    const point: MergedPoint = { date }
+    maps.forEach((m, i) => {
+      const p = m.get(date)
+      if (i <= 1) {
+        // 최신 2개: ensemble + currentLevel 모두
+        point[`master_${i}`] = p?.ensembleMaster
+        point[`rank1_${i}`] = p?.ensembleRank1
+      }
+      // 모든 데이터: currentLevel
+      point[`level_${i}`] = p?.currentLevel
+    })
+    return point
+  })
 }
 
 const CustomTooltip = ({ active, payload, label }: {
@@ -17,6 +47,8 @@ const CustomTooltip = ({ active, payload, label }: {
   label?: string
 }) => {
   if (!active || !payload?.length) return null
+  const visible = payload.filter(p => p.value !== undefined && p.value !== 0)
+  if (!visible.length) return null
   return (
     <div
       className="rounded-xl p-3 text-xs shadow-xl"
@@ -27,7 +59,7 @@ const CustomTooltip = ({ active, payload, label }: {
       }}
     >
       <p className="font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>{label}</p>
-      {payload.map(p => (
+      {visible.map(p => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ background: p.color }} />
           <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
@@ -40,8 +72,13 @@ const CustomTooltip = ({ active, payload, label }: {
   )
 }
 
-export function DtwChart({ data }: DtwChartProps) {
-  if (!data || data.length === 0) {
+// 오래된 데이터일수록 점점 연하게
+const LEVEL_COLORS = ['#94a3b8', '#64748b', '#475569']
+
+export function DtwChart({ datasets, assetName }: DtwChartProps) {
+  const validDatasets = datasets.filter(ds => ds.data.length > 0)
+
+  if (validDatasets.length === 0) {
     return (
       <div className="flex items-center justify-center h-[200px] text-xs" style={{ color: 'var(--text-muted)' }}>
         데이터 없음
@@ -49,7 +86,14 @@ export function DtwChart({ data }: DtwChartProps) {
     )
   }
 
-  const allValues = data.flatMap(d => [d.ensembleMaster, d.ensembleRank1, d.currentLevel]).filter(v => v !== 0)
+  const merged = buildMergedData(validDatasets)
+
+  const allValues = merged.flatMap(p =>
+    Object.entries(p)
+      .filter(([k]) => k !== 'date')
+      .map(([, v]) => v as number)
+  ).filter(v => v !== undefined && v !== 0)
+
   const minVal = Math.min(...allValues)
   const maxVal = Math.max(...allValues)
   const padding = (maxVal - minVal) * 0.1 || Math.abs(maxVal) * 0.05
@@ -57,13 +101,12 @@ export function DtwChart({ data }: DtwChartProps) {
 
   const formatDate = (d: string) => {
     const parts = d.split('-')
-    if (parts.length >= 3) return `${parts[1]}/${parts[2]}`
-    return d
+    return parts.length >= 3 ? `${parts[1]}/${parts[2]}` : d
   }
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+      <LineChart data={merged} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
         <XAxis
           dataKey="date"
@@ -82,39 +125,49 @@ export function DtwChart({ data }: DtwChartProps) {
           tickFormatter={v => v.toLocaleString()}
         />
         <Tooltip content={<CustomTooltip />} />
-        <Legend
-          wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }}
-          iconType="circle"
-          iconSize={6}
-        />
-        <Line
-          type="monotone"
-          dataKey="ensembleMaster"
-          name="Ensemble Master"
-          stroke="#a78bfa"
-          strokeWidth={2}
-          dot={false}
-          activeDot={{ r: 3 }}
-        />
-        <Line
-          type="monotone"
-          dataKey="ensembleRank1"
-          name="Rank 1"
-          stroke="#fbbf24"
-          strokeWidth={1.5}
-          strokeDasharray="5 3"
-          dot={false}
-          activeDot={{ r: 3 }}
-        />
-        <Line
-          type="monotone"
-          dataKey="currentLevel"
-          name="Current Level"
-          stroke="#94a3b8"
-          strokeWidth={2}
-          dot={false}
-          activeDot={{ r: 3 }}
-        />
+        <Legend wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }} iconType="circle" iconSize={6} />
+
+        {validDatasets.map((ds, i) => {
+          const label = ds.label
+          if (i === 0) {
+            // 최신: 모두 실선으로
+            return [
+              <Line key={`master_${i}`} type="monotone" dataKey={`master_${i}`}
+                name="Ensemble Master" stroke="#a78bfa" strokeWidth={2}
+                dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />,
+              <Line key={`rank1_${i}`} type="monotone" dataKey={`rank1_${i}`}
+                name="Rank 1" stroke="#fbbf24" strokeWidth={1.5} strokeDasharray="5 3"
+                dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />,
+              <Line key={`level_${i}`} type="monotone" dataKey={`level_${i}`}
+                name="Current Level" stroke="#94a3b8" strokeWidth={2}
+                dot={false} activeDot={{ r: 3 }} connectNulls legendType="circle" />,
+            ]
+          }
+          if (i === 1) {
+            // 이전 1주: ensemble 계열 연한 점선 + currentLevel
+            return [
+              <Line key={`master_${i}`} type="monotone" dataKey={`master_${i}`}
+                name={`Master (${label})`} stroke="#a78bfa" strokeWidth={1}
+                strokeDasharray="4 4" strokeOpacity={0.35}
+                dot={false} activeDot={{ r: 2 }} connectNulls legendType="none" />,
+              <Line key={`rank1_${i}`} type="monotone" dataKey={`rank1_${i}`}
+                name={`Rank1 (${label})`} stroke="#fbbf24" strokeWidth={1}
+                strokeDasharray="4 4" strokeOpacity={0.35}
+                dot={false} activeDot={{ r: 2 }} connectNulls legendType="none" />,
+              <Line key={`level_${i}`} type="monotone" dataKey={`level_${i}`}
+                name={`Level (${label})`} stroke={LEVEL_COLORS[1]} strokeWidth={1}
+                strokeOpacity={0.5} strokeDasharray="3 3"
+                dot={false} activeDot={{ r: 2 }} connectNulls legendType="none" />,
+            ]
+          }
+          // 2번째 이상 오래된 것: currentLevel만
+          return [
+            <Line key={`level_${i}`} type="monotone" dataKey={`level_${i}`}
+              name={`Level (${label})`} stroke={LEVEL_COLORS[Math.min(i, LEVEL_COLORS.length - 1)]}
+              strokeWidth={1} strokeOpacity={0.3} strokeDasharray="2 4"
+              dot={false} activeDot={{ r: 2 }} connectNulls legendType="none" />,
+          ]
+        })}
       </LineChart>
     </ResponsiveContainer>
   )
