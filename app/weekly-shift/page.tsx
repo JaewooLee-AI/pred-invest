@@ -1,12 +1,12 @@
 import { Navbar } from '@/components/Navbar'
 import { WeeklyShiftViewer } from '@/components/gallery/WeeklyShiftViewer'
-import { getAllWeeklyShifts } from '@/lib/db'
+import { getAllWeeklyShifts, getClosingPrices } from '@/lib/db'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
 export default async function WeeklyShiftPage() {
-  const shifts = await getAllWeeklyShifts()
+  const [shifts, closingPrices] = await Promise.all([getAllWeeklyShifts(), getClosingPrices()])
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
@@ -46,7 +46,7 @@ export default async function WeeklyShiftPage() {
 
         {/* Legend */}
         <div
-          className="rounded-2xl p-5 mb-6 grid grid-cols-1 sm:grid-cols-3 gap-5"
+          className="rounded-2xl p-5 mb-6 grid grid-cols-1 sm:grid-cols-4 gap-5"
           style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
         >
           <div className="flex items-start gap-3">
@@ -81,6 +81,19 @@ export default async function WeeklyShiftPage() {
               <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>회색 실선 — Current Level</p>
               <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 현재 가격 수준 (기준선)
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="flex items-center gap-[3px] mt-1 shrink-0">
+              {[0, 1, 2].map(i => (
+                <div key={i} className="w-2 h-[2.5px] rounded-full" style={{ background: '#34d399' }} />
+              ))}
+            </div>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>녹색 점선 — 실제 종가</p>
+              <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                이전 기간 확장 시 해당 날짜의 실제 종가 — DTW 예측 궤적과의 사후 비교
               </p>
             </div>
           </div>
@@ -123,7 +136,7 @@ export default async function WeeklyShiftPage() {
             </Link>
           </div>
         ) : (
-          <WeeklyShiftViewer shifts={shifts} />
+          <WeeklyShiftViewer shifts={shifts} closingPrices={closingPrices} />
         )}
       </main>
     </div>

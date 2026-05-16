@@ -45,6 +45,38 @@ function parsePercent(val: string): number {
   return parseFloat(val.replace('%', '').trim()) || 0
 }
 
+export type ClosingPriceData = Record<string, Record<string, number>>  // { date: { asset: close } }
+
+export function parseClosingPriceCsv(text: string): ClosingPriceData {
+  const lines = text.split('\n').filter(l => l.trim())
+  if (lines.length < 2) return {}
+
+  const header = lines[0].split(',').map(s => s.trim())
+  const dateIdx = header.findIndex(h => h.toLowerCase() === 'date')
+  if (dateIdx < 0) return {}
+
+  // Find columns ending with _Close and map to asset name
+  const closeColumns: Array<{ idx: number; asset: string }> = []
+  for (let i = 0; i < header.length; i++) {
+    if (i === dateIdx) continue
+    const match = header[i].match(/^(.+)_Close$/i)
+    if (match) closeColumns.push({ idx: i, asset: match[1] })
+  }
+
+  const result: ClosingPriceData = {}
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(s => s.trim())
+    const date = cols[dateIdx]
+    if (!date) continue
+    result[date] = {}
+    for (const { idx, asset } of closeColumns) {
+      const val = parseFloat(cols[idx])
+      if (!isNaN(val)) result[date][asset] = val
+    }
+  }
+  return result
+}
+
 export function parseCsvText(text: string): ParsedChartData {
   const lines = text.split('\n').filter(l => l.trim())
   if (lines.length < 3) return {}

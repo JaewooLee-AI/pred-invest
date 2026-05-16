@@ -15,6 +15,8 @@ export interface DtwDataset {
 interface DtwChartProps {
   datasets: DtwDataset[]
   assetName?: string
+  height?: number
+  closingPrices?: Record<string, number>  // { date: close }
 }
 
 // 현재 데이터에 없는 날짜만 이전 데이터에서 가져와 하나의 연속 배열로 합산
@@ -22,11 +24,16 @@ function buildMergedData(datasets: DtwDataset[], prevCount: number): DtwDataPoin
   const current = datasets[0]?.data ?? []
   const currentDates = new Set(current.map(d => d.date))
 
+  const sortedCurrent = [...current].sort((a, b) => a.date.localeCompare(b.date))
+  const latestCurrentLevel = sortedCurrent[sortedCurrent.length - 1]?.currentLevel ?? 0
+
+  const seenDates = new Set(currentDates)
   const extra: DtwDataPoint[] = []
   for (const ds of datasets.slice(1, prevCount + 1)) {
     for (const p of ds.data) {
-      if (!currentDates.has(p.date)) {
-        extra.push(p)
+      if (!seenDates.has(p.date)) {
+        seenDates.add(p.date)
+        extra.push({ ...p, currentLevel: latestCurrentLevel })
       }
     }
   }
@@ -65,7 +72,7 @@ const CustomTooltip = ({ active, payload, label }: {
   )
 }
 
-export function DtwChart({ datasets }: DtwChartProps) {
+export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProps) {
   const [prevCount, setPrevCount] = useState(0)
 
   const current = datasets[0]?.data ?? []
@@ -79,10 +86,16 @@ export function DtwChart({ datasets }: DtwChartProps) {
     )
   }
 
-  const data = buildMergedData(datasets, prevCount)
+  const baseData = buildMergedData(datasets, prevCount)
+  const data = baseData.map(d => ({
+    ...d,
+    actualClose: closingPrices?.[d.date] ?? undefined,
+  }))
 
-  const allValues = data.flatMap(d => [d.ensembleMaster, d.ensembleRank1, d.currentLevel])
-    .filter(v => v !== 0 && v !== undefined)
+  const allValues = data.flatMap(d => [
+    d.ensembleMaster, d.ensembleRank1, d.currentLevel,
+    d.actualClose !== undefined ? d.actualClose : undefined,
+  ]).filter((v): v is number => v !== undefined && v !== 0)
   const minVal = Math.min(...allValues)
   const maxVal = Math.max(...allValues)
   const padding = (maxVal - minVal) * 0.1 || Math.abs(maxVal) * 0.05
@@ -116,7 +129,7 @@ export function DtwChart({ datasets }: DtwChartProps) {
         </div>
       )}
 
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
           <XAxis
@@ -146,6 +159,11 @@ export function DtwChart({ datasets }: DtwChartProps) {
           <Line type="monotone" dataKey="currentLevel"
             name="Current Level" stroke="#94a3b8" strokeWidth={2}
             dot={false} activeDot={{ r: 3 }} />
+          {closingPrices && Object.keys(closingPrices).length > 0 && (
+            <Line type="monotone" dataKey="actualClose"
+              name="실제 종가" stroke="#34d399" strokeWidth={1.5} strokeDasharray="4 2"
+              dot={false} activeDot={{ r: 3 }} connectNulls={false} />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>

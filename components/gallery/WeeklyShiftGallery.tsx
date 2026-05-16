@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { DtwChart } from '@/components/charts/DtwChart'
 import type { WeeklyShift } from '@/lib/db'
+import type { ClosingPriceData } from '@/lib/csv-parser'
 
 interface WeeklyShiftGalleryProps {
   shifts: WeeklyShift[]
+  closingPrices: ClosingPriceData
 }
 
-export function WeeklyShiftGallery({ shifts }: WeeklyShiftGalleryProps) {
+export function WeeklyShiftGallery({ shifts, closingPrices }: WeeklyShiftGalleryProps) {
   const [selectedName, setSelectedName] = useState<string | null>(null)
 
   const primary = shifts[0]
@@ -26,6 +28,14 @@ export function WeeklyShiftGallery({ shifts }: WeeklyShiftGalleryProps) {
         data: s.assets.find(a => a.name === assetName)?.data ?? [],
       }))
       .filter(ds => ds.data.length > 0)
+  }
+
+  function getAssetClosingPrices(assetName: string): Record<string, number> {
+    const result: Record<string, number> = {}
+    for (const [date, assets] of Object.entries(closingPrices)) {
+      if (assets[assetName] !== undefined) result[date] = assets[assetName]
+    }
+    return result
   }
 
   return (
@@ -55,7 +65,7 @@ export function WeeklyShiftGallery({ shifts }: WeeklyShiftGalleryProps) {
             >
               {asset.name}
             </p>
-            <DtwChart datasets={getDatasetsForAsset(asset.name)} assetName={asset.name} />
+            <DtwChart datasets={getDatasetsForAsset(asset.name)} assetName={asset.name} closingPrices={getAssetClosingPrices(asset.name)} />
             {asset.description && (
               <p className="text-[10px] mt-2 line-clamp-2" style={{ color: 'var(--text-muted)' }}>
                 {asset.description}
@@ -95,7 +105,7 @@ export function WeeklyShiftGallery({ shifts }: WeeklyShiftGalleryProps) {
               </button>
             </div>
             <div className="p-6">
-              <DtwChart datasets={getDatasetsForAsset(selectedAsset.name)} assetName={selectedAsset.name} />
+              <DtwChart datasets={getDatasetsForAsset(selectedAsset.name)} assetName={selectedAsset.name} closingPrices={getAssetClosingPrices(selectedAsset.name)} height={380} />
             </div>
             {selectedAsset.description && (
               <div className="px-5 py-4" style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-elevated)' }}>

@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import type { ProbIndexPoint } from './prob-index-parser'
-import type { DtwDataPoint } from './csv-parser'
+import type { ClosingPriceData, DtwDataPoint } from './csv-parser'
 
 export interface AssetComment {
   [asset: string]: string
@@ -128,7 +128,7 @@ export async function getLatestWeeklyShift(): Promise<WeeklyShift | null> {
   const { data } = await supabase
     .from('pred_invest_weekly_shifts')
     .select('*')
-    .order('uploaded_at', { ascending: false })
+    .order('label', { ascending: false })
     .limit(1)
     .maybeSingle()
   if (!data) return null
@@ -144,7 +144,7 @@ export async function getAllWeeklyShifts(): Promise<WeeklyShift[]> {
   const { data } = await supabase
     .from('pred_invest_weekly_shifts')
     .select('*')
-    .order('uploaded_at', { ascending: false })
+    .order('label', { ascending: false })
     .limit(50)
   if (!data) return []
   return data.map(r => ({
@@ -249,6 +249,27 @@ export async function getAllRegisteredUsers(): Promise<RegisteredUser[]> {
     approvedBy: r.approved_by ?? null,
     createdAt: r.created_at,
   }))
+}
+
+export async function getClosingPrices(): Promise<ClosingPriceData> {
+  const { data } = await supabase
+    .from('pred_invest_closing_prices')
+    .select('prices')
+    .eq('id', 'singleton')
+    .maybeSingle()
+  return (data?.prices as ClosingPriceData) ?? {}
+}
+
+export async function upsertClosingPrices(newPrices: ClosingPriceData): Promise<void> {
+  const existing = await getClosingPrices()
+  const merged: ClosingPriceData = { ...existing }
+  for (const [date, assets] of Object.entries(newPrices)) {
+    merged[date] = { ...(merged[date] ?? {}), ...assets }
+  }
+  const { error } = await supabase
+    .from('pred_invest_closing_prices')
+    .upsert({ id: 'singleton', uploaded_at: new Date().toISOString(), prices: merged })
+  if (error) throw error
 }
 
 export async function getAllNotices(): Promise<Notice[]> {

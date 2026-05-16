@@ -6,6 +6,7 @@ const adminNav = [
   { href: '/admin/upload-csv', label: 'CSV 업로드', icon: '◉' },
   { href: '/admin/upload-prob', label: '확률/지수 업로드', icon: '◌' },
   { href: '/admin/weekly-shift', label: '주간 궤적 업로드', icon: '◎' },
+  { href: '/admin/closing-price', label: '종가 데이터 업로드', icon: '◈' },
   { href: '/admin/notice', label: '공지사항 업로드', icon: '◻' },
   { href: '/admin/users', label: '사용자 관리', icon: '◑' },
 ]
