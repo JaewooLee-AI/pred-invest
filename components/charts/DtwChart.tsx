@@ -27,20 +27,17 @@ interface UnifiedPoint {
 }
 
 function buildUnifiedData(current: DtwDataPoint[], prevDatasets: DtwDataset[]): UnifiedPoint[] {
-  const currentDates = new Set(current.map(d => d.date))
-
-  // 현재에 없는 날짜만 이전 데이터에서 수집 (최신 이전 우선)
+  // 이전 데이터 전체를 포함 (날짜 겹침 여부 무관) — 겹치는 구간에서 두 예측선 동시 표시
+  // 여러 이전 데이터셋은 최신 이전 우선으로 병합
   const prevMap = new Map<string, { master: number; rank1: number }>()
   for (const ds of [...prevDatasets].reverse()) {
     for (const p of ds.data) {
-      if (!currentDates.has(p.date)) {
-        prevMap.set(p.date, { master: p.ensembleMaster, rank1: p.ensembleRank1 })
-      }
+      prevMap.set(p.date, { master: p.ensembleMaster, rank1: p.ensembleRank1 })
     }
   }
 
   const currMap = new Map(current.map(d => [d.date, d]))
-  const allDates = Array.from(new Set([...prevMap.keys(), ...current.map(d => d.date)])).sort()
+  const allDates = Array.from(new Set([...prevMap.keys(), ...currMap.keys()])).sort()
 
   return allDates.map(date => {
     const c = currMap.get(date)
