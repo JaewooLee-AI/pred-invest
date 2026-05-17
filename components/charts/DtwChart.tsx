@@ -73,9 +73,11 @@ const CustomTooltip = ({ active, payload, label }: {
 
 export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProps) {
   const [prevCount, setPrevCount] = useState(0)
+  const [showClose, setShowClose] = useState(true)
 
   const current = datasets[0]?.data ?? []
   const availablePrev = datasets.slice(1).filter(ds => ds.data.length > 0)
+  const hasCloseData = !!closingPrices && Object.keys(closingPrices).length > 0
 
   if (current.length === 0) {
     return (
@@ -93,7 +95,7 @@ export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProp
 
   const allValues = data.flatMap(d => [
     d.ensembleMaster, d.ensembleRank1, d.currentLevel,
-    d.actualClose !== undefined ? d.actualClose : undefined,
+    (showClose && d.actualClose !== undefined) ? d.actualClose : undefined,
   ]).filter((v): v is number => v !== undefined && v !== 0)
   const minVal = Math.min(...allValues)
   const maxVal = Math.max(...allValues)
@@ -107,24 +109,45 @@ export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProp
 
   return (
     <div>
-      {availablePrev.length > 0 && (
-        <div className="flex items-center gap-1.5 mb-2">
-          <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>이전 포함</span>
-          <select
-            value={prevCount}
-            onChange={e => setPrevCount(Number(e.target.value))}
-            className="text-[9px] font-mono rounded border px-1.5 py-0.5 outline-none cursor-pointer"
-            style={{
-              borderColor: 'var(--purple-border)',
-              background: 'var(--purple-tint)',
-              color: 'var(--purple)',
-            }}
-          >
-            <option value={0}>없음</option>
-            {availablePrev.map((_, i) => (
-              <option key={i + 1} value={i + 1}>{i + 1}주 전</option>
-            ))}
-          </select>
+      {(availablePrev.length > 0 || hasCloseData) && (
+        <div className="flex items-center gap-3 mb-2">
+          {availablePrev.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>이전 포함</span>
+              <select
+                value={prevCount}
+                onChange={e => setPrevCount(Number(e.target.value))}
+                className="text-[9px] font-mono rounded border px-1.5 py-0.5 outline-none cursor-pointer"
+                style={{
+                  borderColor: 'var(--purple-border)',
+                  background: 'var(--purple-tint)',
+                  color: 'var(--purple)',
+                }}
+              >
+                <option value={0}>없음</option>
+                {availablePrev.map((_, i) => (
+                  <option key={i + 1} value={i + 1}>{i + 1}주 전</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {hasCloseData && (
+            <button
+              onClick={() => setShowClose(v => !v)}
+              className="flex items-center gap-1 text-[9px] font-mono rounded border px-1.5 py-0.5 transition-colors"
+              style={{
+                borderColor: showClose ? 'rgba(52,199,89,0.35)' : 'var(--border)',
+                background: showClose ? 'rgba(52,199,89,0.08)' : 'transparent',
+                color: showClose ? '#34c759' : 'var(--text-muted)',
+              }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full shrink-0"
+                style={{ background: showClose ? '#34c759' : 'var(--text-muted)' }}
+              />
+              종가
+            </button>
+          )}
         </div>
       )}
 
@@ -158,7 +181,7 @@ export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProp
           <Line type="monotone" dataKey="currentLevel"
             name="Current Level" stroke="#8e8e93" strokeWidth={2}
             dot={false} activeDot={{ r: 3, strokeWidth: 0, fill: '#8e8e93' }} />
-          {closingPrices && Object.keys(closingPrices).length > 0 && (
+          {hasCloseData && showClose && (
             <Line type="monotone" dataKey="actualClose"
               name="실제 종가" stroke="#34c759" strokeWidth={2} strokeDasharray="3 3"
               dot={{ r: 3, fill: '#34c759', strokeWidth: 0 }}
