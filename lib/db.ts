@@ -231,6 +231,7 @@ export interface RegisteredUser {
   approved: boolean
   approvedAt: string | null
   approvedBy: string | null
+  lifetime: boolean
   createdAt: string
 }
 
@@ -247,6 +248,7 @@ export async function getAllRegisteredUsers(): Promise<RegisteredUser[]> {
     approved: r.approved,
     approvedAt: r.approved_at ?? null,
     approvedBy: r.approved_by ?? null,
+    lifetime: r.lifetime ?? false,
     createdAt: r.created_at,
   }))
 }

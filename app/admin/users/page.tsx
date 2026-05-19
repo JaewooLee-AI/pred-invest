@@ -1,12 +1,14 @@
 import { getAllRegisteredUsers } from '@/lib/db'
 import { approveUserAction, revokeUserAction } from '@/app/actions/users'
+import { LifetimeGrantButton } from '@/components/LifetimeGrantButton'
 
 export const dynamic = 'force-dynamic'
 
 const ADMIN_EMAIL = 'jaewoolee.ai@gmail.com'
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
 
-function getUserStatus(user: { approved: boolean; firstLoginAt: string }) {
+function getUserStatus(user: { approved: boolean; firstLoginAt: string; lifetime: boolean }) {
+  if (user.lifetime) return 'lifetime' as const
   if (user.approved) return 'approved' as const
   const elapsed = Date.now() - new Date(user.firstLoginAt).getTime()
   return elapsed < SEVEN_DAYS_MS ? 'trial' : 'expired' as const
@@ -16,7 +18,15 @@ function daysElapsed(firstLoginAt: string) {
   return Math.floor((Date.now() - new Date(firstLoginAt).getTime()) / (24 * 60 * 60 * 1000))
 }
 
-function StatusBadge({ status, days }: { status: 'approved' | 'trial' | 'expired'; days: number }) {
+function StatusBadge({ status, days }: { status: 'lifetime' | 'approved' | 'trial' | 'expired'; days: number }) {
+  if (status === 'lifetime') {
+    return (
+      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+        style={{ background: 'rgba(217,119,6,0.10)', border: '1px solid rgba(217,119,6,0.30)', color: '#d97706' }}>
+        ★ 평생회원
+      </span>
+    )
+  }
   if (status === 'approved') {
     return (
       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
@@ -45,7 +55,8 @@ function StatusBadge({ status, days }: { status: 'approved' | 'trial' | 'expired
 export default async function UsersPage() {
   const users = await getAllRegisteredUsers()
 
-  const approved = users.filter(u => u.approved).length
+  const lifetime = users.filter(u => u.lifetime).length
+  const approved = users.filter(u => u.approved && !u.lifetime).length
   const trial = users.filter(u => !u.approved && Date.now() - new Date(u.firstLoginAt).getTime() < SEVEN_DAYS_MS).length
   const expired = users.filter(u => !u.approved && Date.now() - new Date(u.firstLoginAt).getTime() >= SEVEN_DAYS_MS).length
 
@@ -66,8 +77,9 @@ export default async function UsersPage() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
+          { label: '평생회원', value: lifetime, color: '#d97706', tint: 'rgba(217,119,6,0.08)', border: 'rgba(217,119,6,0.25)' },
           { label: '승인됨', value: approved, color: 'var(--emerald)', tint: 'var(--emerald-tint)', border: 'var(--emerald-border)' },
           { label: '체험중', value: trial, color: 'var(--blue)', tint: 'var(--blue-tint)', border: 'var(--blue-border)' },
           { label: '체험만료', value: expired, color: 'var(--rose)', tint: 'var(--rose-tint)', border: 'var(--rose-border)' },
@@ -136,21 +148,24 @@ export default async function UsersPage() {
 
                   {/* Actions */}
                   {!isAdmin && (
-                    <div className="shrink-0">
-                      {status !== 'approved' ? (
+                    <div className="shrink-0 flex items-center gap-2">
+                      {status === 'lifetime' ? null : status === 'approved' ? (
+                        <>
+                          <LifetimeGrantButton email={u.email} />
+                          <form action={revokeUserAction}>
+                            <input type="hidden" name="email" value={u.email} />
+                            <button type="submit" className="btn-danger text-xs px-3 py-1.5 rounded-lg">
+                              승인 취소
+                            </button>
+                          </form>
+                        </>
+                      ) : (
                         <form action={approveUserAction}>
                           <input type="hidden" name="email" value={u.email} />
                           <button type="submit"
                             className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-90"
                             style={{ background: 'linear-gradient(135deg, #059669, #10b981)', color: '#fff' }}>
                             승인
-                          </button>
-                        </form>
-                      ) : (
-                        <form action={revokeUserAction}>
-                          <input type="hidden" name="email" value={u.email} />
-                          <button type="submit" className="btn-danger text-xs px-3 py-1.5 rounded-lg">
-                            승인 취소
                           </button>
                         </form>
                       )}
