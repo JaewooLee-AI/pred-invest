@@ -19,6 +19,15 @@ interface DtwChartProps {
   closingPrices?: Record<string, number>  // { date: close }
 }
 
+// DTW 날짜(주간) + 종가 일간 날짜를 합산한 차트 포인트
+interface ChartPoint {
+  date: string
+  ensembleMaster?: number
+  ensembleRank1?: number
+  currentLevel?: number
+  actualClose?: number
+}
+
 // 현재 데이터에 없는 날짜만 이전 데이터에서 가져와 하나의 연속 배열로 합산
 function buildMergedData(datasets: DtwDataset[], prevCount: number): DtwDataPoint[] {
   const current = datasets[0]?.data ?? []
@@ -88,10 +97,31 @@ export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProp
   }
 
   const baseData = buildMergedData(datasets, prevCount)
-  const data = baseData.map(d => ({
-    ...d,
-    actualClose: closingPrices?.[d.date] ?? undefined,
-  }))
+
+  // DTW 주간 날짜를 기반으로 맵 생성; showClose 시 일간 종가 날짜 삽입
+  const data: ChartPoint[] = (() => {
+    const map: Record<string, ChartPoint> = {}
+    for (const d of baseData) {
+      map[d.date] = {
+        date: d.date,
+        ensembleMaster: d.ensembleMaster || undefined,
+        ensembleRank1: d.ensembleRank1 || undefined,
+        currentLevel: d.currentLevel || undefined,
+        actualClose: closingPrices?.[d.date],
+      }
+    }
+    if (showClose && hasCloseData) {
+      const sorted = [...baseData].sort((a, b) => a.date.localeCompare(b.date))
+      const minDate = sorted[0]?.date ?? ''
+      const maxDate = sorted[sorted.length - 1]?.date ?? ''
+      for (const [date, close] of Object.entries(closingPrices!)) {
+        if (date >= minDate && date <= maxDate && !map[date]) {
+          map[date] = { date, actualClose: close }
+        }
+      }
+    }
+    return Object.values(map).sort((a, b) => a.date.localeCompare(b.date))
+  })()
 
   const allValues = data.flatMap(d => [
     d.ensembleMaster, d.ensembleRank1, d.currentLevel,
@@ -174,13 +204,13 @@ export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProp
           <Legend wrapperStyle={{ fontSize: '10px', color: 'var(--text-muted)' }} iconType="circle" iconSize={6} />
           <Line type="monotone" dataKey="ensembleMaster"
             name="Ensemble Master" stroke="#0071e3" strokeWidth={2.5}
-            dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#0071e3' }} />
+            dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#0071e3' }} connectNulls />
           <Line type="monotone" dataKey="ensembleRank1"
             name="Rank 1" stroke="#ff9500" strokeWidth={2} strokeDasharray="5 4"
-            dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#ff9500' }} />
+            dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#ff9500' }} connectNulls />
           <Line type="monotone" dataKey="currentLevel"
             name="Current Level" stroke="#8e8e93" strokeWidth={2}
-            dot={false} activeDot={{ r: 3, strokeWidth: 0, fill: '#8e8e93' }} />
+            dot={false} activeDot={{ r: 3, strokeWidth: 0, fill: '#8e8e93' }} connectNulls />
           {hasCloseData && showClose && (
             <Line type="monotone" dataKey="actualClose"
               name="실제 종가" stroke="#34c759" strokeWidth={2} strokeDasharray="3 3"
