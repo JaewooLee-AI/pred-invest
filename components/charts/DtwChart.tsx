@@ -98,28 +98,38 @@ export function DtwChart({ datasets, height = 200, closingPrices }: DtwChartProp
 
   const baseData = buildMergedData(datasets, prevCount)
 
-  // DTW 주간 날짜를 기반으로 맵 생성; showClose 시 일간 종가 날짜 삽입
+  // 종가 데이터가 있으면 전체 범위를 영업일(월~금)로 채워 X축 간격을 균일하게 만듦
   const data: ChartPoint[] = (() => {
+    const sorted = [...baseData].sort((a, b) => a.date.localeCompare(b.date))
+    const minDate = sorted[0]?.date ?? ''
+    const maxDate = sorted[sorted.length - 1]?.date ?? ''
     const map: Record<string, ChartPoint> = {}
+
+    if (hasCloseData && minDate && maxDate) {
+      // 전체 영업일 삽입 (종가 유무와 관계없이 — X축 균일화)
+      const cur = new Date(minDate + 'T00:00:00Z')
+      const end = new Date(maxDate + 'T00:00:00Z')
+      while (cur <= end) {
+        const dow = cur.getUTCDay()
+        if (dow !== 0 && dow !== 6) {
+          const ds = cur.toISOString().split('T')[0]
+          map[ds] = { date: ds, actualClose: closingPrices![ds] }
+        }
+        cur.setUTCDate(cur.getUTCDate() + 1)
+      }
+    }
+
+    // DTW 주간 데이터 덮어쓰기
     for (const d of baseData) {
       map[d.date] = {
+        ...map[d.date],
         date: d.date,
         ensembleMaster: d.ensembleMaster || undefined,
         ensembleRank1: d.ensembleRank1 || undefined,
         currentLevel: d.currentLevel || undefined,
-        actualClose: closingPrices?.[d.date],
       }
     }
-    if (showClose && hasCloseData) {
-      const sorted = [...baseData].sort((a, b) => a.date.localeCompare(b.date))
-      const minDate = sorted[0]?.date ?? ''
-      const maxDate = sorted[sorted.length - 1]?.date ?? ''
-      for (const [date, close] of Object.entries(closingPrices!)) {
-        if (date >= minDate && date <= maxDate && !map[date]) {
-          map[date] = { date, actualClose: close }
-        }
-      }
-    }
+
     return Object.values(map).sort((a, b) => a.date.localeCompare(b.date))
   })()
 
